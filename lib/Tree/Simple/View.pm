@@ -4,7 +4,9 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
+
+use Scalar::Util qw(blessed);
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -20,7 +22,7 @@ sub new {
 
 sub _init {
     my ($self, $tree, %config) = @_;
-    (defined($tree) && ref($tree) && UNIVERSAL::isa($tree, "Tree::Simple"))
+    (blessed($tree) && $tree->isa("Tree::Simple"))
         || die "Insufficient Arguments : tree argument must be a Tree::Simple object";
     $self->{tree} = $tree;
     $self->{config} = \%config if %config;

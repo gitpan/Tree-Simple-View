@@ -1,5 +1,10 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.11 Thurs Nov 18 2004
+    - now using Scalar::Util::blessed() instead of 
+      the convoluted UNIVERSAL::isa() stuff. 
+      - added Scalar::Util as a dependency
+
 0.10 Sat Aug 7 2004
     - Added the setPathComparisonFunction method
       so that custom node value's can be compared
