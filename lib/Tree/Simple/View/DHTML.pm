@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -151,9 +151,15 @@ use constant LIST_FUNCTION_CODE_STRING => q|
         return "</${list_type}L>" if ($tag_type == CLOSE_TAG);        
         # test the most functional first
         if ($tag_type == OPEN_TAG && $list_id && $display_style) {
-            my $temp_list_css = $list_css;
-            chop($temp_list_css);            
-            $temp_list_css .= " display: $display_style;'";
+            my $temp_list_css;
+            if ($list_css) {
+                $temp_list_css = $list_css;
+                chop($temp_list_css);            
+                $temp_list_css .= " display: $display_style;'";
+            }
+            else {
+                $temp_list_css = " STYLE='display: $display_style;'"
+            }
             return "<${list_type}L${temp_list_css} ID='${list_id}'>" 
         }
         # next...
@@ -177,6 +183,9 @@ sub _buildListItemFunction {
         $link_css = " CLASS='" . $config{link_css_class} . "'";
     } 
     
+    my $form_element_formatter;
+    $form_element_formatter = $config{form_element_formatter} if exists $config{form_element_formatter};
+    
     # now compile the subroutine in the current environment    
     return eval $self->LIST_ITEM_FUNCTION_CODE_STRING;
 }
@@ -187,11 +196,16 @@ use constant LIST_ITEM_FUNCTION_CODE_STRING  => q|;
         my $item_css = $list_item_css;
         if ($is_expanded) {
             $item_css = $expanded_item_css if $expanded_item_css;
-            return "<LI${item_css}><A${link_css} HREF=# onClick='toggleList(\"${tree_id}\")'>" . 
+            return "<LI${item_css}>" . 
+                        (($form_element_formatter) ? $form_element_formatter->($t) : "") . 
+                    "<A${link_css} HREF=# onClick='toggleList(\"${tree_id}\")'>" . 
                             (($node_formatter) ? $node_formatter->($t) : $t->getNodeValue()) . 
                     "</A></LI>";            
         }
-        return "<LI${item_css}>" . (($node_formatter) ? $node_formatter->($t) : $t->getNodeValue()) . "</LI>";
+        return "<LI${item_css}>" . 
+                    (($form_element_formatter) ? $form_element_formatter->($t) : "") . 
+                    (($node_formatter) ? $node_formatter->($t) : $t->getNodeValue()) . 
+                "</LI>";
     }
 |;
 
@@ -258,16 +272,23 @@ Tree::Simple::View::DHTML - A class for viewing Tree::Simple heirarchies in DHTM
                                    
   # an unordered list (default) and a mixture of CSS property
   # strings and CSS classes, along with the node_formatter option
-  # so all the nodes will be formatted by this subroutine 
+  # so all the nodes will be formatted by this subroutine, and 
+  # even more, the form_element_formatter which can be used to
+  # create a form element after the LI tag (and if applicable
+  # before the A tag)
   my $tree_view = Tree::Simple::View::DHTML->new($tree => (
                                 list_css => "list-style: circle;",
                                 list_item_css => "font-family: courier;",
                                 expanded_item_css_class => "myExpandedListItemClass",                                
                                 link_css_class => "myListItemLinkClass"                                  
                                 node_formatter => sub {
-                                    my ($node) = @_;
-                                    return "<B>" . $node->description() . "</B>";
-                                    }
+                                    my ($tree) = @_;
+                                    return "<B>" . $tree->description() . "</B>";
+                                    },
+                                form_element_formatter => sub {
+                                    my ($tree) = @_;
+                                    return "<INPUT TYPE='radio' NAME='tree_id' VALUE='" . $tree->id . "'>";
+                                    }    
                                 ));  
 
   # print out the javascript nessecary for the DHTML 
@@ -338,7 +359,19 @@ This can be a CSS class name which is applied to the link (C<A> tag) which serve
 
 This can be a CODE reference which will be given the current tree object as its only argument. The output of this subroutine will be placed within the link tags (C<A>) which themselves are within the list item tags (C<LI>). This option can be used to implement; custom formatting of the node, handling of complex node objects. 
 
+=item I<form_element_formatter>
+
+This can be a CODE reference which will be given the current tree object as its only argument. The output of this subroutine will be placed after the list item (C<LI>) tags, and if applicable, before the the link tag (C<A>). This option can be used to add a form element such a radio button or checkbox to each element of the tree, which is useful when creating selection widgets. 
+
 =back
+
+=item B<getTree>
+
+A basic accessor to reach the underlying tree object. 
+
+=item B<getConfig>
+
+A basic accessor to reach the underlying configuration hash. 
 
 =item B<expandPath (@path)>
 

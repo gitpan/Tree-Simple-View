@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::Base;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @ISA = qw(Tree::Simple::View::Base);
 
@@ -313,6 +313,14 @@ This can be a CSS class name which is applied to the list item tag (C<LI>) if it
 This can be a CODE reference which will be given the current tree object as its only argument. The output of this subroutine will be placed within the list item tags (C<LI>). This option can be used to implement; custom formatting of the node, handling of complex node objects or implementing any type of handler code to drive your interface (using link tags or form submissions, etc). 
 
 =back
+
+=item B<getTree>
+
+A basic accessor to reach the underlying tree object. 
+
+=item B<getConfig>
+
+A basic accessor to reach the underlying configuration hash. 
 
 =item B<expandPath (@path)>
 

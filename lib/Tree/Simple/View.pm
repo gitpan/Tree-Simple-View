@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 my $VIEW_TYPE = "HTML";
 
@@ -61,6 +61,10 @@ Depending upon the value given in the C<use> statement, this will return an inst
 =item B<More Tests>
 
 We could use some more tests, to help increase the coverage (which is only at 70.9% right now). Normally I would not release a module with coverage this low, but I need to get back to working on a project for a client (for which this module was created). But because I will be using this module in this project, I know I will be able to improve the test suite as I go.
+
+=item B<get a demo up for people to see> 
+
+I would like to link to a demo of the DHTML in particular, I have to find space on the company web server for that though.
 
 =item B<Adding new Tree::Simple::View::* classes>
 

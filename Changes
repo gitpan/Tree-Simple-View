@@ -1,5 +1,15 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.02 Tues Jun 22 2004
+    - added simple accessors for the tree and configurations
+      to the Base class
+    - added the 'form_element_formatter' to the DHTML class
+      which allows for form elements to be added to the tree
+      outside of the link tag. 
+    - fixed a bug in the DHTML implementation where the DHTML
+      would not work if you had not set a link_css value. Now
+      you it does work :)
+
 0.01 Fri Jun 18 14:38:19 2004
     - module created
 

@@ -4,7 +4,7 @@ package Tree::Simple::View::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -24,6 +24,16 @@ sub _init {
         || die "Insufficient Arguments : tree argument must be a Tree::Simple object";
     $self->{tree} = $tree;
     $self->{config} = \%config if %config;
+}
+
+sub getTree {
+    my ($self) = @_;
+    return $self->{tree};
+}
+
+sub getConfig {
+    my ($self) = @_;
+    return $self->{config};
 }
 
 sub expandPath {
@@ -69,6 +79,14 @@ This is an abstract base class for the Tree::Simple::View::* classes. It sets up
 =item B<new ($tree, %configuration)>
 
 Accepts a C<$tree> argument of a Tree::Simple object (or one derived from Tree::Simple). This C<$tree> object does not need to be a ROOT, you can start at any level of the tree you desire. The options in the C<%config> argument are determined by the implementing subclass, and you should refer to that documentation for details.
+
+=item B<getTree>
+
+A basic accessor to reach the underlying tree object. 
+
+=item B<getConfig>
+
+A basic accessor to reach the underlying configuration hash. 
 
 =item B<expandPath (@path)>
 
