@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 46;
+use Test::More tests => 49;
 
 BEGIN { 
     use_ok('Tree::Simple::View::DHTML');
@@ -656,4 +656,57 @@ EXPECTED
     is($output, $expected, '... got what we expected');
                        
 }
+
+{
+    my $tree_view = Tree::Simple::View::DHTML->new($tree, 
+                                list_css_class => "listClass",
+                                list_item_css_class => "listItemClass",
+                                expanded_item_css_class => "expandedItemClass",
+                                link_css_class => "linkClass",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" } 
+                                );
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    # test that perls string-to-number conversion will
+    # cause the values below to become the correct numbers 
+    $tree_view->setPathComparisonFunction(sub { $_[0] == $_[1]->getNodeValue() });    
+    
+    my $output = $tree_view->expandPath(qw(0001 0001.2));
+    ok($output, '... make sure we got some output');
+    
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
+    my $expected = <<EXPECTED;
+<UL CLASS='listClass'>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: block;' ID='${view_id}_1'>
+<LI CLASS='listItemClass'>1.1 Level</LI>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: block;' ID='${view_id}_2'>
+<LI CLASS='listItemClass'>1.2.1 Level</LI>
+<LI CLASS='listItemClass'>1.2.2 Level</LI>
+</UL>
+<LI CLASS='listItemClass'>1.3 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: none;' ID='${view_id}_3'>
+<LI CLASS='listItemClass'>2.1 Level</LI>
+<LI CLASS='listItemClass'>2.2 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: none;' ID='${view_id}_4'>
+<LI CLASS='listItemClass'>3.1 Level</LI>
+<LI CLASS='listItemClass'>3.2 Level</LI>
+<LI CLASS='listItemClass'>3.3 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: none;' ID='${view_id}_5'>
+<LI CLASS='listItemClass'>4.1 Level</LI>
+</UL></UL>
+EXPECTED
+
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
 

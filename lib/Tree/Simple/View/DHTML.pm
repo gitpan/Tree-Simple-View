@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -14,6 +14,8 @@ use constant OPEN_TAG => 1;
 use constant CLOSE_TAG => 2;
 
 use constant EXPANDED => 3;
+
+## private methods
 
 sub _init {
     my ($self, @args) = @_;
@@ -39,7 +41,7 @@ sub expandPathSimple  {
     my $traversal_sub = sub {
         my ($t) = @_;
         my $display_style = "none";        
-        if (defined $current_path && $current_path eq $t->getNodeValue()) {
+        if (defined $current_path && $self->_compareNodeToPath($current_path, $t)) {
             $display_style = "block";
             $current_path = shift @path;
         }
@@ -76,7 +78,7 @@ sub expandPathComplex {
     my $traversal_sub = sub {
         my ($t) = @_;
         my $display_style = "none";        
-        if (defined $current_path && $current_path eq $t->getNodeValue()) {
+        if (defined $current_path && $self->_compareNodeToPath($current_path, $t)) {
             $display_style = "block";
             $current_path = shift @path;
         }        
@@ -391,6 +393,10 @@ A basic accessor to reach the underlying configuration hash.
 
 This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off.
 
+=item B<setPathComparisonFunction ($CODE)>
+
+This takes a C<$CODE> reference, which can be used to add custom path comparison features to Tree::Simple::View. The function will get two arguments, the first is the C<$current_path>, the second is the C<$current_tree>. When using C<expandPath>, it may sometimes be nessecary to be able to control the comparison of the path values. For instance, your node may be an object and need a specific method called to match the path against. 
+
 =item B<expandPath (@path)>
 
 This method will return a string of HTML which will represent your tree expanded along the given C<@path>. This is best shown visually. Given this tree:
@@ -543,6 +549,14 @@ None that I am aware of. Of course, if you find a bug, let me know, and I will b
 =head1 CODE COVERAGE
 
 See the CODE COVERAGE section of Tree::Simple::View for details.
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Thanks to Brett Nuske for the idea of the I<use_tree_uid> configuration parameter.
+
+=back
 
 =head1 SEE ALSO
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 27;
+use Test::More tests => 29;
 use Test::Exception;
 
 BEGIN { 
@@ -48,6 +48,12 @@ is($tree_view->getTree(), $tree, '... our tree is the same');
 
 can_ok($tree_view, 'getConfig');
 is_deeply($tree_view->getConfig(), \%config, '... our configs are the same');
+
+can_ok($tree_view, 'setPathComparisonFunction');
+
+throws_ok {
+    $tree_view->setPathComparisonFunction()
+} qr/Insufficient Arguments/, '... this should die from bad input';
 
 # test the expandAll
 
@@ -100,4 +106,6 @@ throws_ok {
 throws_ok {
     $tree_view2->expandAll();
 } qr/Method Not Implemented/, '... this should die because it calls an abstract method';
+
+
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 46;
 
 BEGIN { 
     use_ok('Tree::Simple::View::HTML');
@@ -482,6 +482,39 @@ EXPECTED
     isa_ok($tree_view, 'Tree::Simple::View::HTML');
     
     my $output = $tree_view->expandPath(2);
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<UL CLASS='listClass'>
+<LI CLASS='listItemClass'>1 Level</LI>
+<LI CLASS='expandedItemClass'>2 Level</LI>
+<UL CLASS='listClass'>
+<LI CLASS='listItemClass'>2.1 Level</LI>
+<LI CLASS='listItemClass'>2.2 Level</LI>
+</UL>
+<LI CLASS='listItemClass'>3 Level</LI>
+<LI CLASS='listItemClass'>4 Level</LI>
+</UL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree, 
+                                list_css_class => "listClass",
+                                list_item_css_class => "listItemClass",
+                                expanded_item_css_class => "expandedItemClass",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" }                                
+                                );
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
+    # test that perls string-to-number conversion will
+    # cause the '0002' below to become the number 2
+    $tree_view->setPathComparisonFunction(sub { $_[0] == $_[1]->getNodeValue() });
+    
+    my $output = $tree_view->expandPath("0002");
     ok($output, '... make sure we got some output');
     
     my $expected = <<EXPECTED;

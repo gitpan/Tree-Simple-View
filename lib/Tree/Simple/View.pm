@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -25,6 +25,7 @@ sub _init {
     $self->{tree} = $tree;
     $self->{config} = \%config if %config;
     $self->{include_trunk} = 0; 
+    $self->{path_comparison_func} = undef;
 }
 
 sub getTree {
@@ -41,6 +42,13 @@ sub includeTrunk {
     my ($self, $boolean) = @_;
     $self->{include_trunk} = ($boolean ? 1 : 0) if defined $boolean;
     return $self->{include_trunk};
+}
+
+sub setPathComparisonFunction {
+    my ($self, $code) = @_;
+    (defined($code) && ref($code) eq "CODE") 
+        || die "Insufficient Arguments : Path comparison must be a function"; 
+    $self->{path_comparison_func} = $code;
 }
 
 sub expandPath {
@@ -62,6 +70,18 @@ sub expandAll {
 # override these method
 sub expandAllSimple  { die "Method Not Implemented" }
 sub expandAllComplex { die "Method Not Implemented" }
+
+## private methods
+
+sub _compareNodeToPath {
+    my ($self, $current_path, $current_tree) = @_;
+    # default to normal node-path comparison ...
+    return $current_path eq $current_tree->getNodeValue() 
+        unless defined $self->{path_comparison_func};
+    # unless we have a path_comparison_func in place
+    # in which case we use that
+    return $self->{path_comparison_func}->($current_path, $current_tree);    
+}
 
 1;
 
@@ -118,6 +138,10 @@ A basic accessor to reach the underlying configuration hash.
 =item B<includeTrunk ($boolean)>
 
 This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off.
+
+=item B<setPathComparisonFunction ($CODE)>
+
+This takes a C<$CODE> reference, which can be used to add custom path comparison features to Tree::Simple::View. The function will get two arguments, the first is the C<$current_path>, the second is the C<$current_tree>. When using C<expandPath>, it may sometimes be nessecary to be able to control the comparison of the path values. For instance, your node may be an object and need a specific method called to match the path against. 
 
 =item B<expandPath (@path)>
 
@@ -245,16 +269,16 @@ I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Deve
  --------------------------------- ------ ------ ------ ------ ------ ------ ------
  File                                stmt branch   cond    sub    pod   time  total
  --------------------------------- ------ ------ ------ ------ ------ ------ ------
- /Tree/Simple/View.pm               100.0   83.3   77.8  100.0  100.0    3.8   95.0
- /Tree/Simple/View/DHTML.pm         100.0   75.0  100.0  100.0  100.0   22.4   94.7
- /Tree/Simple/View/HTML.pm           98.5   73.1   62.5  100.0  100.0   37.4   89.4
- t/10_Tree_Simple_View_test.t       100.0    n/a    n/a  100.0    n/a   27.6  100.0
- t/20_Tree_Simple_View_HTML_test.t  100.0    n/a    n/a  100.0    n/a    2.0  100.0
- t/30_Tree_Simple_View_DHTML_test.t 100.0    n/a    n/a  100.0    n/a    5.0  100.0
- t/pod.t                            100.0   50.0    n/a  100.0    n/a    0.9   95.2
- t/pod_coverage.t                   100.0   50.0    n/a  100.0    n/a    0.9   95.2 
+ /Tree/Simple/View.pm               100.0   87.5   75.0  100.0  100.0    3.3   94.8
+ /Tree/Simple/View/DHTML.pm         100.0   77.3  100.0  100.0  100.0   19.6   95.2
+ /Tree/Simple/View/HTML.pm           98.5   75.0   62.5  100.0  100.0   65.2   89.8
+ t/10_Tree_Simple_View_test.t       100.0    n/a    n/a  100.0    n/a    1.7  100.0
+ t/20_Tree_Simple_View_HTML_test.t  100.0    n/a    n/a  100.0    n/a    1.4  100.0
+ t/30_Tree_Simple_View_DHTML_test.t 100.0    n/a    n/a  100.0    n/a    2.3  100.0
+ t/pod.t                            100.0   50.0    n/a  100.0    n/a    5.6   95.2
+ t/pod_coverage.t                   100.0   50.0    n/a  100.0    n/a    0.8   95.2 
  --------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                               99.7   74.1   71.8  100.0  100.0  100.0   95.5
+ Total                               99.7   76.7   71.4  100.0  100.0  100.0   95.9
  --------------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 SEE ALSO
@@ -290,6 +314,14 @@ This module actually seems to do something very similar to these modules, but to
 =item B<CGI::Explorer>
 
 This module is similar to the HTML::PopupTreeSelect, in that it is intended for a more singular purpose. This module implements a Windows-style explorer tree.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item Thanks to Neyuki for the idea of the C<setPathComparisonFunction> method.
 
 =back
 

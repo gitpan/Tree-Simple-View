@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our @ISA = qw(Tree::Simple::View);
 
@@ -35,7 +35,7 @@ sub expandPathSimple  {
     else {
         push @results => "<UL>";
         foreach my $child ($tree->getAllChildren()) {
-            if (defined $current_path && $child->getNodeValue() eq $current_path) {
+            if (defined $current_path && $self->_compareNodeToPath($current_path, $child)) {
                 push @results => ("<LI>" . $child->getNodeValue() . "</LI>");
                 push @results => ($self->expandPathSimple($child, @path));
             }
@@ -55,13 +55,13 @@ sub expandPathComplex {
     
     # use the helper function to recurse
     my $_expandPathComplex = sub {
-        my ($self, $list_func, $list_item_func, $tree, $current_path, @path) = @_;
+        my ($self_func, $list_func, $list_item_func, $tree, $current_path, @path) = @_;
         my @results = ($list_func->(OPEN_TAG));
         foreach my $child ($tree->getAllChildren()) {
-            if (defined $current_path && $child->getNodeValue() eq $current_path) {
+            if (defined $current_path && $self->_compareNodeToPath($current_path, $child)) {
                 unless ($child->isLeaf()) {
                     push @results => ($list_item_func->($child, EXPANDED));
-                    push @results => ($self->($self, $list_func, $list_item_func, $child, @path));
+                    push @results => ($self_func->($self_func, $list_func, $list_item_func, $child, @path));
                 }
                 else {
                     push @results => ($list_item_func->($child));
@@ -78,7 +78,7 @@ sub expandPathComplex {
     my @results;
     if ($self->{include_trunk}) {    
         push @results => ($list_func->(OPEN_TAG));
-        if (defined $current_path && $tree->getNodeValue() eq $current_path) {      
+        if (defined $current_path && $self->_compareNodeToPath($current_path, $tree)) {      
             push @results => ($list_item_func->($tree, EXPANDED));     
             push @results => $_expandPathComplex->($_expandPathComplex, $list_func, $list_item_func, $tree, @path);
         }
@@ -143,6 +143,8 @@ sub expandAllComplex {
     push @results => ($list_func->(CLOSE_TAG) x ($last_depth + 1)); 
     return (join "\n" => @results);
 }
+
+## private methods
 
 # process configurations
 
@@ -358,7 +360,11 @@ A basic accessor to reach the underlying configuration hash.
 
 =item B<includeTrunk ($boolean)>
 
-This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off.
+This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off. 
+
+=item B<setPathComparisonFunction ($CODE)>
+
+This takes a C<$CODE> reference, which can be used to add custom path comparison features to Tree::Simple::View. The function will get two arguments, the first is the C<$current_path>, the second is the C<$current_tree>. When using C<expandPath>, it may sometimes be nessecary to be able to control the comparison of the path values. For instance, your node may be an object and need a specific method called to match the path against. 
 
 =item B<expandPath (@path)>
 
