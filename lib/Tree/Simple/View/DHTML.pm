@@ -4,21 +4,20 @@ package Tree::Simple::View::DHTML;
 use strict;
 use warnings;
 
-use Tree::Simple::View::HTML;
+our $VERSION = '0.11';
 
-our $VERSION = '0.10';
+use base 'Tree::Simple::View::HTML';
 
-our @ISA = qw(Tree::Simple::View::HTML);
+use Tree::Simple::View::Exceptions;
 
-use constant OPEN_TAG => 1;
+use constant OPEN_TAG  => 1;
 use constant CLOSE_TAG => 2;
-
-use constant EXPANDED => 3;
+use constant EXPANDED  => 3;
 
 ## private methods
 
 sub _init {
-    my ($self, @args) = @_;
+    my ($self, @args) = @_;    
     $self->SUPER::_init(@args);
     $self->{list_counter_id} = 0;
     ($self->{obj_id}) = ("$self" =~ /\((.*?)\)$/);
@@ -208,10 +207,36 @@ sub _buildListItemFunction {
     } 
     
     my $form_element_formatter;
-    $form_element_formatter = $config{form_element_formatter} if exists $config{form_element_formatter};
+    if (exists $config{form_element_formatter}) {
+        $form_element_formatter = $config{form_element_formatter};
+    }
+    else {
+        if (exists $config{radio_button}) {
+            $form_element_formatter = $self->_makeRadioButtonFormatter($config{radio_button});
+        }
+        elsif (exists $config{checkbox}) {
+            $form_element_formatter = $self->_makeCheckBoxFormatter($config{checkbox});
+        }    
+    }
     
     # now compile the subroutine in the current environment    
     return eval $self->LIST_ITEM_FUNCTION_CODE_STRING;
+}
+
+sub _makeRadioButtonFormatter {
+    my ($self, $radio_button_id) = @_;
+    return sub {
+        my ($t) = @_;
+        return "<INPUT TYPE='radio' NAME='$radio_button_id' VALUE='" . $t->getUID() . "'>";
+    }
+}
+
+sub _makeCheckBoxFormatter {
+    my ($self, $checkbox_id) = @_;
+    return sub {
+        my ($t) = @_;
+        return "<INPUT TYPE='checkbox' NAME='$checkbox_id' VALUE='" . $t->getUID() . "'>";
+    }
 }
 
 use constant LIST_ITEM_FUNCTION_CODE_STRING  => q|;
@@ -296,11 +321,9 @@ Tree::Simple::View::DHTML - A class for viewing Tree::Simple hierarchies in DHTM
                                     my ($tree) = @_;
                                     return "<B>" . $tree->getNodeValue()->description() . "</B>";
                                     },
-                                # add a form element to the tree
-                                form_element_formatter => sub {
-                                    my ($tree) = @_;
-                                    return "<INPUT TYPE='radio' NAME='tree_id' VALUE='" . $tree->getNodeValue()->id() . "'>";
-                                    }    
+                                # add a radio button element to the tree
+                                # with the name of 'tree_id'
+                                radio_button => 'tree_id'    
                                 ));  
 
   # print out the javascript nessecary for the DHTML 
@@ -370,6 +393,14 @@ This can be a CSS class name which is applied to the link (C<A> tag) which serve
 =item I<node_formatter>
 
 This can be a CODE reference which will be given the current tree object as its only argument. The output of this subroutine will be placed within the link tags (C<A>) which themselves are within the list item tags (C<LI>). This option can be used to implement; custom formatting of the node, handling of complex node objects. 
+
+=item I<radio_button>
+
+This will create a radio button for each node of the tree with the C<INPUT> C<NAME> attribute being the value of this attribute. This is basically a 'macro' for the I<form_element_formatter>.
+
+=item I<checkbox>
+
+This will create a checkbox for each node of the tree with the C<INPUT> C<NAME> attribute being the value of this attribute. This is basically a 'macro' for the I<form_element_formatter>.
 
 =item I<form_element_formatter>
 

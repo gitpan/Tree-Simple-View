@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 49;
+use Test::More tests => 55;
 
 BEGIN { 
     use_ok('Tree::Simple::View::DHTML');
@@ -709,4 +709,94 @@ EXPECTED
     is($output, $expected, '... got what we expected');
 }
 
+# I need to do this so it's easier to test 
+# the new radio and check button formatters
+my $UIDS = 1;
+$tree->traverse(sub { $_[0]->setUID($UIDS++) }); 
+
+{     
+    my $tree_view = Tree::Simple::View::DHTML->new($tree,
+                                        radio_button => 'tree_radio_button'
+                                        );
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
+    my $expected = <<EXPECTED;
+<UL>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='1'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
+<UL ID='${view_id}_1'>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='2'>1.1</LI>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='3'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<UL ID='${view_id}_2'>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='4'>1.2.1</LI>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='5'>1.2.2</LI>
+</UL>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='6'>1.3</LI>
+</UL>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='7'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
+<UL ID='${view_id}_3'>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='8'>2.1</LI>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='9'>2.2</LI>
+</UL>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='10'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
+<UL ID='${view_id}_4'>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='11'>3.1</LI>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='12'>3.2</LI>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='13'>3.3</LI>
+</UL>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='14'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
+<UL ID='${view_id}_5'>
+<LI><INPUT TYPE='radio' NAME='tree_radio_button' VALUE='15'>4.1</LI>
+</UL></UL>
+EXPECTED
+
+    chomp $expected;
+    is($output, $expected, '... got what we expected');
+}
+
+{     
+    my $tree_view = Tree::Simple::View::DHTML->new($tree,
+                                        checkbox => 'tree_check_button'
+                                        );
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
+    my $expected = <<EXPECTED;
+<UL>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='1'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
+<UL ID='${view_id}_1'>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='2'>1.1</LI>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='3'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<UL ID='${view_id}_2'>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='4'>1.2.1</LI>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='5'>1.2.2</LI>
+</UL>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='6'>1.3</LI>
+</UL>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='7'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
+<UL ID='${view_id}_3'>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='8'>2.1</LI>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='9'>2.2</LI>
+</UL>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='10'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
+<UL ID='${view_id}_4'>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='11'>3.1</LI>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='12'>3.2</LI>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='13'>3.3</LI>
+</UL>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='14'><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
+<UL ID='${view_id}_5'>
+<LI><INPUT TYPE='checkbox' NAME='tree_check_button' VALUE='15'>4.1</LI>
+</UL></UL>
+EXPECTED
+
+    chomp $expected;
+    is($output, $expected, '... got what we expected');
+}
 

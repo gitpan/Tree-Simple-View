@@ -1,5 +1,14 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.12 Mon Jan 31 2005
+    - converted this to use Class::Throwable for exceptions
+       - altered tests for this
+       
+    - added the 'radio_button' and 'checkbox' attributes to
+      the Tree::Simple::View::DHTML class
+        - added tests for this
+        - added documentation for this
+
 0.11 Thurs Nov 18 2004
     - now using Scalar::Util::blessed() instead of 
       the convoluted UNIVERSAL::isa() stuff. 

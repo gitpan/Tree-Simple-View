@@ -4,13 +4,17 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Scalar::Util qw(blessed);
+
+use Tree::Simple::View::Exceptions;
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
     my $class = ref($_class) || $_class;
+    ($class ne 'Tree::Simple::View')
+        || throw Tree::Simple::View::AbstractClass "Tree::Simple::View is an abstract class, try Tree::Simple::View::HTML or Tree::Simple::View::DHTML instead"; 
     my $tree_view = {
         tree => undef,
         config => {}
@@ -23,7 +27,7 @@ sub new {
 sub _init {
     my ($self, $tree, %config) = @_;
     (blessed($tree) && $tree->isa("Tree::Simple"))
-        || die "Insufficient Arguments : tree argument must be a Tree::Simple object";
+        || throw Tree::Simple::View::InsufficientArguments "tree argument must be a Tree::Simple object";
     $self->{tree} = $tree;
     $self->{config} = \%config if %config;
     $self->{include_trunk} = 0; 
@@ -49,7 +53,7 @@ sub includeTrunk {
 sub setPathComparisonFunction {
     my ($self, $code) = @_;
     (defined($code) && ref($code) eq "CODE") 
-        || die "Insufficient Arguments : Path comparison must be a function"; 
+        || throw Tree::Simple::View::InsufficientArguments "Path comparison must be a function"; 
     $self->{path_comparison_func} = $code;
 }
 
@@ -60,8 +64,8 @@ sub expandPath {
 }
 
 # override these method
-sub expandPathSimple  { die "Method Not Implemented" }
-sub expandPathComplex { die "Method Not Implemented" }
+sub expandPathSimple  { throw Tree::Simple::View::AbstractMethod "Method Not Implemented" }
+sub expandPathComplex { throw Tree::Simple::View::AbstractMethod "Method Not Implemented" }
 
 sub expandAll {
     my ($self) = @_;
@@ -70,8 +74,8 @@ sub expandAll {
 }
 
 # override these method
-sub expandAllSimple  { die "Method Not Implemented" }
-sub expandAllComplex { die "Method Not Implemented" }
+sub expandAllSimple  { throw Tree::Simple::View::AbstractMethod "Method Not Implemented" }
+sub expandAllComplex { throw Tree::Simple::View::AbstractMethod "Method Not Implemented" }
 
 ## private methods
 
@@ -268,20 +272,16 @@ None that I am aware of. Of course, if you find a bug, let me know, and I will b
 
 I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Devel::Cover> report on this module test suite.
 
- --------------------------------- ------ ------ ------ ------ ------ ------ ------
- File                                stmt branch   cond    sub    pod   time  total
- --------------------------------- ------ ------ ------ ------ ------ ------ ------
- /Tree/Simple/View.pm               100.0   87.5   75.0  100.0  100.0    3.3   94.8
- /Tree/Simple/View/DHTML.pm         100.0   77.3  100.0  100.0  100.0   19.6   95.2
- /Tree/Simple/View/HTML.pm           98.5   75.0   62.5  100.0  100.0   65.2   89.8
- t/10_Tree_Simple_View_test.t       100.0    n/a    n/a  100.0    n/a    1.7  100.0
- t/20_Tree_Simple_View_HTML_test.t  100.0    n/a    n/a  100.0    n/a    1.4  100.0
- t/30_Tree_Simple_View_DHTML_test.t 100.0    n/a    n/a  100.0    n/a    2.3  100.0
- t/pod.t                            100.0   50.0    n/a  100.0    n/a    5.6   95.2
- t/pod_coverage.t                   100.0   50.0    n/a  100.0    n/a    0.8   95.2 
- --------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                               99.7   76.7   71.4  100.0  100.0  100.0   95.9
- --------------------------------- ------ ------ ------ ------ ------ ------ ------
+ ------------------------------ ------ ------ ------ ------ ------ ------ ------
+ File                             stmt branch   cond    sub    pod   time  total
+ ------------------------------ ------ ------ ------ ------ ------ ------ ------
+ Tree/Simple/View.pm             100.0   88.9   66.7  100.0  100.0   13.3   95.2
+ Tree/Simple/View/DHTML.pm        99.3   79.2  100.0  100.0  100.0   57.9   95.3
+ Tree/Simple/View/Exceptions.pm  100.0    n/a    n/a  100.0    n/a    1.9  100.0
+ Tree/Simple/View/HTML.pm         98.5   75.0   62.5  100.0  100.0   27.0   89.9
+ ------------------------------ ------ ------ ------ ------ ------ ------ ------
+ Total                            99.1   78.8   69.2  100.0  100.0  100.0   93.2
+ ------------------------------ ------ ------ ------ ------ ------ ------ ------
 
 =head1 SEE ALSO
 

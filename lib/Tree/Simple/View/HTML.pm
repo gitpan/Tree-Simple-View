@@ -4,16 +4,15 @@ package Tree::Simple::View::HTML;
 use strict;
 use warnings;
 
-use Tree::Simple::View;
+our $VERSION = '0.11';
 
-our $VERSION = '0.10';
+use base 'Tree::Simple::View';
 
-our @ISA = qw(Tree::Simple::View);
+use Tree::Simple::View::Exceptions;
 
-use constant OPEN_TAG => 1;
+use constant OPEN_TAG  => 1;
 use constant CLOSE_TAG => 2;
-
-use constant EXPANDED => 3;
+use constant EXPANDED  => 3;
 
 ## public methods
 
@@ -152,8 +151,10 @@ sub _processConfig {
     my ($self, $config) = @_;
     my %config = %{$config};
         
-    my $list_func = $self->_buildListFunction(%config) || die "list function didnt compile : $@";
-    my $list_item_func  = $self->_buildListItemFunction(%config) || die "list item function didnt compile : $@";
+    my $list_func = $self->_buildListFunction(%config) 
+        || throw Tree::Simple::View::CompilationFailed "list function didn't compile", $@;
+    my $list_item_func  = $self->_buildListItemFunction(%config) 
+    	|| throw Tree::Simple::View::CompilationFailed "list item function didn't compile", $@;
 
     return ($list_func, $list_item_func);
 }
