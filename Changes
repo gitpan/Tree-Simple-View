@@ -1,5 +1,12 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.07 Thurs July 15 2004
+    - added includeTrunk method, and implemented the
+      necessary functionality in ::HTML and ::DHTML.
+      - added tests to check this new functionality
+        as well
+      - added documentation on this new functionality
+
 0.06 Fri July 2 2004
     - Added a number of tests to the suite as well as 
       improved some existing tests.

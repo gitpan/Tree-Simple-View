@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -29,7 +29,7 @@ sub expandPathSimple  {
     my $root_depth = $tree->getDepth() + 1;  
     my ($tree_id) = ("$self" =~ /\((.*?)\)$/);
     my $last_depth = -1;
-    $self->{tree}->traverse(sub {
+    my $traversal_sub = sub {
         my ($t) = @_;
         my $display_style = "none";        
         if (defined $current_path && $current_path eq $t->getNodeValue()) {
@@ -48,8 +48,11 @@ sub expandPathSimple  {
             push @results => ("<LI>" . $t->getNodeValue() . "</LI>");
         }
         $last_depth = $current_depth;
-    });
+    };
+    $traversal_sub->($self->{tree}) if $self->{include_trunk};
+    $self->{tree}->traverse($traversal_sub);
     $last_depth -= $root_depth;    
+    $last_depth++ if $self->{include_trunk};    
     push @results => ("</UL>" x ($last_depth + 1)); 
     
     return (join "\n" => @results);   
@@ -64,7 +67,7 @@ sub expandPathComplex {
     my $root_depth = $tree->getDepth() + 1;  
     my ($tree_id) = ("$self" =~ /\((.*?)\)$/);      
     my $last_depth = -1;
-    $self->{tree}->traverse(sub {
+    my $traversal_sub = sub {
         my ($t) = @_;
         my $display_style = "none";        
         if (defined $current_path && $current_path eq $t->getNodeValue()) {
@@ -82,8 +85,11 @@ sub expandPathComplex {
             push @results => ($list_item_func->($t));
         }        
         $last_depth = $current_depth;
-    });
+    };
+    $traversal_sub->($self->{tree}) if $self->{include_trunk};
+    $self->{tree}->traverse($traversal_sub);    
     $last_depth -= $root_depth;    
+    $last_depth++ if $self->{include_trunk};    
     push @results => ($list_func->(CLOSE_TAG) x ($last_depth + 1)); 
     return (join "\n" => @results);
 }
@@ -94,7 +100,7 @@ sub expandAllSimple  {
     my $root_depth = $self->{tree}->getDepth() + 1;  
     my ($tree_id) = ("$self" =~ /\((.*?)\)$/);
     my $last_depth = -1;
-    $self->{tree}->traverse(sub {
+    my $traversal_sub = sub {
         my ($t) = @_;
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
@@ -108,8 +114,11 @@ sub expandAllSimple  {
             push @results => ("<LI>" . $t->getNodeValue() . "</LI>");
         }
         $last_depth = $current_depth;
-    });
-    $last_depth -= $root_depth;    
+    };
+    $traversal_sub->($self->{tree}) if $self->{include_trunk};
+    $self->{tree}->traverse($traversal_sub);     
+    $last_depth -= $root_depth;  
+    $last_depth++ if $self->{include_trunk};
     push @results => ("</UL>" x ($last_depth + 1)); 
     return (join "\n" => @results);
 }
@@ -123,7 +132,7 @@ sub expandAllComplex {
     my $root_depth = $self->{tree}->getDepth() + 1;  
     my ($tree_id) = ("$self" =~ /\((.*?)\)$/);      
     my $last_depth = -1;
-    $self->{tree}->traverse(sub {
+    my $traversal_sub = sub {
         my ($t) = @_;
         my $current_depth = $t->getDepth();
         push @results => ($list_func->(CLOSE_TAG) x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
@@ -136,8 +145,11 @@ sub expandAllComplex {
             push @results => ($list_item_func->($t));
         }        
         $last_depth = $current_depth;
-    });
+    };
+    $traversal_sub->($self->{tree}) if $self->{include_trunk};
+    $self->{tree}->traverse($traversal_sub);     
     $last_depth -= $root_depth;    
+    $last_depth++ if $self->{include_trunk};    
     push @results => ($list_func->(CLOSE_TAG) x ($last_depth + 1)); 
     return (join "\n" => @results);
 }
@@ -366,6 +378,10 @@ A basic accessor to reach the underlying tree object.
 =item B<getConfig>
 
 A basic accessor to reach the underlying configuration hash. 
+
+=item B<includeTrunk ($boolean)>
+
+This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off.
 
 =item B<expandPath (@path)>
 

@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -24,6 +24,7 @@ sub _init {
         || die "Insufficient Arguments : tree argument must be a Tree::Simple object";
     $self->{tree} = $tree;
     $self->{config} = \%config if %config;
+    $self->{include_trunk} = 0;
 }
 
 sub getTree {
@@ -34,6 +35,12 @@ sub getTree {
 sub getConfig {
     my ($self) = @_;
     return $self->{config};
+}
+
+sub includeTrunk {
+    my ($self, $boolean) = @_;
+    $self->{include_trunk} = ($boolean ? 1 : 0) if defined $boolean;
+    return $self->{include_trunk};
 }
 
 sub expandPath {
@@ -62,7 +69,7 @@ __END__
 
 =head1 NAME
 
-Tree::Simple::View - A base for a set of classes used for viewing Tree::Simple hierarchies in various output formats
+Tree::Simple::View - A set of classes for viewing Tree::Simple hierarchies
 
 =head1 SYNOPSIS
 
@@ -90,7 +97,7 @@ This serves as an abstract base class to the Tree::Simple::View::* classes. Ther
 
 These modules are pretty close to being complete at this point. The API is stable and should not change, although some more configuration options may get added, none will be deleted. We are currently using the Tree::Simple::DHTML module on a project which will soon go through QA and into production, which will help us find lingering any bugs and/or browser issues. The plan is to release this as 1.0 once we move this site into production.
 
-I have run some I<rough> benchmarks on my Powerbook (500 mHz G4 w/ 512K of RAM) running OS X (10.3.4). I used a 1200+ node Tree::Simple hierarchy and tested it with range of configuration options. For simple (no configuration) rendering it was able to render approx. 15 times a second. For more complex renderings (with a configuration), it was able to render approx. 10 times a second. Interestingly enough, no matter home complex the configuration, the render time remained pretty much constant. I expect these numbers would be much higher if I had run them our webserver (usually Linux running on P3 or P4 and min. 1 GB of RAM), and I will include more thorough benchmark stats in the 1.0 release documentation. 
+I have run some I<rough> benchmarks on my Powerbook (500 mHz G4 w/ 512MB of RAM) running OS X (10.3.4). I used a 1200+ node Tree::Simple hierarchy and tested it with range of configuration options. For simple (no configuration) rendering it was able to render approx. 15 times a second. For more complex renderings (with a configuration), it was able to render approx. 10 times a second. Interestingly enough, no matter home complex the configuration, the render time remained pretty much constant. I expect these numbers would be much higher if I had run them our webserver (usually Linux running on P3 or P4 and min. 1 GB of RAM), and I will include more thorough benchmark stats in the 1.0 release documentation. 
 
 =head1 METHODS
 
@@ -107,6 +114,10 @@ A basic accessor to reach the underlying tree object.
 =item B<getConfig>
 
 A basic accessor to reach the underlying configuration hash. 
+
+=item B<includeTrunk ($boolean)>
+
+This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off.
 
 =item B<expandPath (@path)>
 
@@ -199,7 +210,13 @@ To view a demo of the Tree::Simple::View::DHTML functionality, look in the C<exa
 
 =over 5
 
+=item B<Test improvement>
+
+Right now the tests really are not as well designed as they could be. There are a number of odd corners and edge cases which are not being tested well enough (this release (0.07) actually lost some coverage since I don't have time to properly design these tests). I am thinking when I do a 1.0 release I will sit down and really plan out a good set of test that will execise all interactions/interminglings/dark-corners/etc of the code.
+
 =item B<Adding new Tree::Simple::View::* classes>
+
+I have been fiddling around with a class which outputs GraphViz .dot files. I am not sure what to call it though; Tree::Simple::View::GraphViz or Tree::Simple::View::Dot. 
 
 I have an Tree::Simple::View::ASCII class in the works, which will output Trees in plain text, and optionally support ANSI colors for terminal output. (NOTE: This may end up being just a thin wrapper around Data::TreeDumper's output, see L<SEE ALSO> section below).
 
@@ -208,6 +225,10 @@ I am considering a Tree::Simple::View::PS or Tree::Simple::View::PDF class which
 I have thought about Tree::Simple::View::XML, but I am not sure it would be useful really.
 
 I suppose that Tree::Simple::View::* classes could be made for various GUI toolkits like Tk, etc. But to tell the truth, I am not that familiar with non-web GUIs, so that is likely a long way off. 
+
+=item B<Different Tree display formats>
+
+I have been experimenting with an algorithm to draw a tree from the top-down in ASCII, the GraphViz output will already do this format, and I have no idea currently how to even code it in HTML/DHTML much less write the code to generate it. I am not sure how useful this will be since it can very quickly get very wide.
 
 =back
 
@@ -222,14 +243,14 @@ I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Deve
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
  File                                 stmt branch   cond    sub    pod   time  total
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- /Tree/Simple/View.pm                100.0  100.0   77.8  100.0  100.0    0.8   97.1
- /Tree/Simple/View/DHTML.pm          100.0   57.7  100.0  100.0  100.0   31.3   93.8
- /Tree/Simple/View/HTML.pm            99.1   72.2   66.7  100.0  100.0   11.6   91.6
- t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a   16.3  100.0
- t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   11.7  100.0
- t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   28.2  100.0
+ /Tree/Simple/View.pm                100.0   83.3   77.8  100.0  100.0    1.6   95.0
+ /Tree/Simple/View/DHTML.pm          100.0   73.8  100.0  100.0  100.0   24.3   94.6
+ /Tree/Simple/View/HTML.pm            98.5   73.1   62.5  100.0  100.0   25.0   89.4
+ t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a   24.0  100.0
+ t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   12.4  100.0
+ t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   12.8  100.0
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                                99.8   70.0   76.7  100.0  100.0  100.0   96.0
+ Total                                99.7   74.5   71.8  100.0  100.0  100.0   95.5
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 SEE ALSO
@@ -248,6 +269,12 @@ There are a few modules out there that I have seen which do similar things to th
 
 =over 4
 
+=item B<Data::TreeDumper>
+
+This module is an alternative to Data::Dumper for dumping out any type of data structures. As the author points out, the output of Data::Dumper when dealing with tree structures can be difficult to read at best. This module solves that problem by dumping a much more readable and understandable output specially for tree structures. Data::TreeDumper has many options for output, including custom filtersand coloring. I have been working with this modules author  and we have been sharing code. Data::TreeDumper can
+output Tree::Simple objects (L<http://search.cpan.org/~nkh/Data-TreeDumper-0.15/TreeDumper.pm#Structure_replacement>). This givesTree::Simple the ability to utilize the ASCII/ANSI output  styles of Data::TreeDumper. Nadim has used some of the code from  Tree::Simple::View to add DHTML output to Data::TreeDumper. The DHTML output can be without tree-lines as for Tree::Simple:View or with 
+tree-lines as with Data::TreeDumper.
+
 =item B<HTML::PopupTreeSelect>
 
 This module implements a DHTML "pop-up" dialog which contains an expand-collapse tree, which can be used for selecting an item from a hierarchy. It looks to me to be very configurable and have all its bases covered, right down to handling some of the uglies of cross-browser/cross-platform DHTML. However it is really for a very specific purpose, and not for general tree display like this module. 
@@ -259,10 +286,6 @@ This module actually seems to do something very similar to these modules, but to
 =item B<CGI::Explorer>
 
 This module is similar to the HTML::PopupTreeSelect, in that it is intended for a more singular purpose. This module implements a Windows-style explorer tree.
-
-=item B<Data::TreeDumper>
-
-This module is an alternative to Data::Dumper for dumping out various types of data structures. As the author points out, the output of Data::Dumper when dealing with tree structures can be difficult to read at best. This module solves that problem by dumping a much more readable and understandable output specialy for tree structres. Data::TreeDumper has many options for output, including custom filters, so it quite possible to produce similar output to these module's using Data::TreeDumper. I have actually been working with this modules author to ensure compatability between Data::TreeDumper and Tree::Simple, and we have been sharing code so that Data::TreeDumper's output can utilize some of Tree::Simple::View's capabilities. Ideally this will give Tree::Simple the ability to utilize the ASCII/ANSI output styles of Data::TreeDumper and Data::TreeDumper the ability to easily display output in HTML/DHTML.
 
 =back
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @ISA = qw(Tree::Simple::View);
 
@@ -19,22 +19,37 @@ use constant EXPANDED => 3;
 
 sub expandPathSimple  { 
     my ($self, $tree, $current_path, @path) = @_;
-    my @results = ("<UL>");
-    foreach my $child ($tree->getAllChildren()) {
-        if (defined $current_path && $child->getNodeValue() eq $current_path) {
-            push @results => ("<LI>" . $child->getNodeValue() . "</LI>");
-            push @results => ($self->expandPathSimple($child, @path));
-        }
-        else {
-            push @results => ("<LI>" . $child->getNodeValue() . "</LI>");
-        }
+    my @results;
+    # if we were not called from this routine, and 
+    # include trunk has been turned on then, this is 
+    # the first time we have been called, so ...
+    if ($self->{include_trunk} && (caller(1))[3] !~ /expandPathSimple$/) {    
+        push @results => "<UL>";
+        push @results => ("<LI>" . $tree->getNodeValue() . "</LI>");     
+        # now recurse but dont change any of the args,
+        # (if we are supposed to that is, based on the path)   
+        push @results => ($self->expandPathSimple($tree, @path))
+            if (defined $current_path && $tree->getNodeValue() eq $current_path); 
+        push @results => "</UL>";               
     }
-    push @results => "</UL>";
-    return (join "\n" => @results);    
+    else {
+        push @results => "<UL>";
+        foreach my $child ($tree->getAllChildren()) {
+            if (defined $current_path && $child->getNodeValue() eq $current_path) {
+                push @results => ("<LI>" . $child->getNodeValue() . "</LI>");
+                push @results => ($self->expandPathSimple($child, @path));
+            }
+            else {
+                push @results => ("<LI>" . $child->getNodeValue() . "</LI>");
+            }
+        }
+        push @results => "</UL>";
+    }
+    return (join "\n" => @results);        
 }
 
 sub expandPathComplex {
-    my ($self, $tree, $config, @path) = @_;
+    my ($self, $tree, $config, $current_path, @path) = @_;
     # get the config
     my ($list_func, $list_item_func) = $self->_processConfig($config);  
     
@@ -59,8 +74,24 @@ sub expandPathComplex {
         push @results => ($list_func->(CLOSE_TAG));
         return (join "\n" => @results);   
     };
-
-    return $_expandPathComplex->($_expandPathComplex, $list_func, $list_item_func, $tree, @path);
+    
+    my @results;
+    if ($self->{include_trunk}) {    
+        push @results => ($list_func->(OPEN_TAG));
+        if (defined $current_path && $tree->getNodeValue() eq $current_path) {      
+            push @results => ($list_item_func->($tree, EXPANDED));     
+            push @results => $_expandPathComplex->($_expandPathComplex, $list_func, $list_item_func, $tree, @path);
+        }
+        else {
+           push @results => ($list_item_func->($tree));     
+        }
+        push @results => ($list_func->(CLOSE_TAG));             
+    } 
+    else {
+        push @results => $_expandPathComplex->($_expandPathComplex, $list_func, $list_item_func, $tree, $current_path, @path);            
+    }    
+    
+    return (join "\n" => @results);   
 }
 
 sub expandAllSimple  {
@@ -68,15 +99,18 @@ sub expandAllSimple  {
     my @results = ("<UL>");
     my $root_depth = $self->{tree}->getDepth() + 1;    
     my $last_depth = -1;
-    $self->{tree}->traverse(sub {
+    my $traversal_sub = sub {
         my ($t) = @_;
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         push @results => ("<LI>" . $t->getNodeValue() . "</LI>");
         push @results => "<UL>" unless $t->isLeaf();
         $last_depth = $current_depth;
-    });
+    };
+    $traversal_sub->($self->{tree}) if $self->{include_trunk};
+    $self->{tree}->traverse($traversal_sub);
     $last_depth -= $root_depth;    
+    $last_depth++ if $self->{include_trunk}; 
     push @results => ("</UL>" x ($last_depth + 1)); 
     return (join "\n" => @results);
 }
@@ -89,7 +123,7 @@ sub expandAllComplex {
     my @results = $list_func->(OPEN_TAG);
     my $root_depth = $self->{tree}->getDepth() + 1;    
     my $last_depth = -1;
-    $self->{tree}->traverse(sub {
+    my $traversal_sub = sub {
         my ($t) = @_;
         my $current_depth = $t->getDepth();
         push @results => ($list_func->(CLOSE_TAG) x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
@@ -101,8 +135,11 @@ sub expandAllComplex {
         }
         push @results => $list_func->(OPEN_TAG) unless $t->isLeaf();
         $last_depth = $current_depth;
-    });
+    };
+    $traversal_sub->($self->{tree}) if $self->{include_trunk};
+    $self->{tree}->traverse($traversal_sub);
     $last_depth -= $root_depth;    
+    $last_depth++ if $self->{include_trunk};  
     push @results => ($list_func->(CLOSE_TAG) x ($last_depth + 1)); 
     return (join "\n" => @results);
 }
@@ -318,6 +355,10 @@ A basic accessor to reach the underlying tree object.
 =item B<getConfig>
 
 A basic accessor to reach the underlying configuration hash. 
+
+=item B<includeTrunk ($boolean)>
+
+This controls the getting and setting (through the optional C<$boolean> argument) of the option to include the tree's trunk in the output. Many times, the trunk is not actually part of the tree, but simply a root from which all the branches spring. However, on occasion, it might be nessecary to view a sub-tree, in which case, the trunk is likely intended to be part of the output. This option defaults to off.
 
 =item B<expandPath (@path)>
 

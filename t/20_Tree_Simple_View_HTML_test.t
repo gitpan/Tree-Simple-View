@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
+use Test::More tests => 43;
 
 BEGIN { 
     use_ok('Tree::Simple::View::HTML');
@@ -86,6 +86,50 @@ EXPECTED
 {
     my $tree_view = Tree::Simple::View::HTML->new($tree);
     isa_ok($tree_view, 'Tree::Simple::View::HTML');
+
+    $tree_view->includeTrunk(1);
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<UL>
+<LI>root</LI>
+<UL>
+<LI>1</LI>
+<UL>
+<LI>1.1</LI>
+<LI>1.2</LI>
+<UL>
+<LI>1.2.1</LI>
+<LI>1.2.2</LI>
+</UL>
+<LI>1.3</LI>
+</UL>
+<LI>2</LI>
+<UL>
+<LI>2.1</LI>
+<LI>2.2</LI>
+</UL>
+<LI>3</LI>
+<UL>
+<LI>3.1</LI>
+<LI>3.2</LI>
+<LI>3.3</LI>
+</UL>
+<LI>4</LI>
+<UL>
+<LI>4.1</LI>
+</UL></UL></UL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree);
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
     
     my $output = $tree_view->expandPath(qw(1 1.2));
     ok($output, '... make sure we got some output');
@@ -105,6 +149,40 @@ EXPECTED
 <LI>2</LI>
 <LI>3</LI>
 <LI>4</LI>
+</UL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree);
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
+    $tree_view->includeTrunk(1);
+    
+    my $output = $tree_view->expandPath(qw(root 1 1.2));
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<UL>
+<LI>root</LI>
+<UL>
+<LI>1</LI>
+<UL>
+<LI>1.1</LI>
+<LI>1.2</LI>
+<UL>
+<LI>1.2.1</LI>
+<LI>1.2.2</LI>
+</UL>
+<LI>1.3</LI>
+</UL>
+<LI>2</LI>
+<LI>3</LI>
+<LI>4</LI>
+</UL>
 </UL>
 EXPECTED
     chomp $expected;
@@ -177,6 +255,50 @@ EXPECTED
     my $tree_view = Tree::Simple::View::HTML->new($tree, (list_type => "ordered"));
     isa_ok($tree_view, 'Tree::Simple::View::HTML');
     
+    $tree_view->includeTrunk(1);
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<OL>
+<LI>root</LI>
+<OL>
+<LI>1</LI>
+<OL>
+<LI>1.1</LI>
+<LI>1.2</LI>
+<OL>
+<LI>1.2.1</LI>
+<LI>1.2.2</LI>
+</OL>
+<LI>1.3</LI>
+</OL>
+<LI>2</LI>
+<OL>
+<LI>2.1</LI>
+<LI>2.2</LI>
+</OL>
+<LI>3</LI>
+<OL>
+<LI>3.1</LI>
+<LI>3.2</LI>
+<LI>3.3</LI>
+</OL>
+<LI>4</LI>
+<OL>
+<LI>4.1</LI>
+</OL></OL></OL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree, (list_type => "ordered"));
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
     my $output = $tree_view->expandPath(3);
     ok($output, '... make sure we got some output');
     
@@ -191,6 +313,36 @@ EXPECTED
 <LI>3.3</LI>
 </OL>
 <LI>4</LI>
+</OL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree, (list_type => "ordered"));
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
+    $tree_view->includeTrunk(1);
+    
+    my $output = $tree_view->expandPath(qw(root 3));
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<OL>
+<LI>root</LI>
+<OL>
+<LI>1</LI>
+<LI>2</LI>
+<LI>3</LI>
+<OL>
+<LI>3.1</LI>
+<LI>3.2</LI>
+<LI>3.3</LI>
+</OL>
+<LI>4</LI>
+</OL>
 </OL>
 EXPECTED
     chomp $expected;
