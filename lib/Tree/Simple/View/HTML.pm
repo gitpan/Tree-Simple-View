@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @ISA = qw(Tree::Simple::View);
 
@@ -228,10 +228,7 @@ Tree::Simple::View::HTML - A class for viewing Tree::Simple hierarchies in HTML
 
   ## more complex examples
                                         
-  # an ordered list with CSS properties specified for 
-  # the list element, the CSS properties specified for 
-  # the list item elements, and the CSS properties 
-  # specified for any "expanded" items                                    
+  # use the CSS properties                                    
   my $tree_view = Tree::Simple::View::HTML->new($tree => (
                                 list_type  => "ordered",
                                 list_css => "list-style: circle;",
@@ -239,26 +236,21 @@ Tree::Simple::View::HTML - A class for viewing Tree::Simple hierarchies in HTML
                                 expanded_item_css => "font-family: courier; font-weight: bold",                               
                                 ));  
                                 
-  # an unordered list (default) with CSS class specified 
-  # for the list element, with the CSS class specified for 
-  # the list item elements, and the CSS class specified
-  # for any "expanded" items                                    
+  # use the CSS classes                                  
   my $tree_view = Tree::Simple::View::HTML->new($tree => (
                                 list_css_class => "myListClass",
                                 list_item_css_class => "myListItemClass",
                                 expanded_item_css_class => "myExpandedListItemClass",                                
                                 ));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
                                    
-  # an unordered list (default) and a mixture of CSS property
-  # strings and CSS classes, along with the node_formatter option
-  # so all the nodes will be formatted by this subroutine 
+  # mix the CSS properties and CSS classes
   my $tree_view = Tree::Simple::View::HTML->new($tree => (
                                 list_css => "list-style: circle;",
                                 list_item_css => "font-family: courier;",
                                 expanded_item_css_class => "myExpandedListItemClass",                                                         
                                 node_formatter => sub {
-                                    my ($node) = @_;
-                                    return "<B>" . $node->description() . "</B>";
+                                    my ($tree) = @_;
+                                    return "<B>" . $tree->getNodeValue()->description() . "</B>";
                                     }
                                 ));  
                               

@@ -1,5 +1,9 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.06 Fri July 2 2004
+    - Added a number of tests to the suite as well as 
+      improved some existing tests.
+
 0.05 Fri Jun 25 2004
     - changes the HREF part of the DHTML links to be
       javascript:void(0) rather than just #, it stops

@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -249,13 +249,8 @@ Tree::Simple::View::DHTML - A class for viewing Tree::Simple hierarchies in DHTM
   my $tree_view = Tree::Simple::View::DHTML->new($tree);
 
   ## more complex examples
-                                        
-  # an ordered list with CSS properties specified for 
-  # the list element, the CSS properties specified for 
-  # the list item elements, the CSS properties specified 
-  # for any "expanded" items, and with CSS properties 
-  # specified for the link (A tag) used to handle the 
-  # javascript for expanding and collapsing the tree                                     
+  
+  # using the CSS properties
   my $tree_view = Tree::Simple::View::DHTML->new($tree => (
                                 list_type  => "ordered",
                                 list_css => "list-style: circle;",
@@ -263,37 +258,30 @@ Tree::Simple::View::DHTML - A class for viewing Tree::Simple hierarchies in DHTM
                                 expanded_item_css => "font-family: courier; font-weight: bold",
                                 link_css => "text-decoration: none;"                                
                                 ));  
-                                
-  # an unordered list (default) with CSS class specified for the 
-  # list element, with the CSS class specified for the list item 
-  # elements, and the CSS class specified for any "expanded" items, 
-  # and finally the CSS class specified for the link (A tag) used 
-  # to handle the javascript for expanding and collapsing the tree                                     
+
+  # using the CSS classes                                                                  
   my $tree_view = Tree::Simple::View::DHTML->new($tree => (
                                 list_css_class => "myListClass",
                                 list_item_css_class => "myListItemClass",
                                 expanded_item_css_class => "myExpandedListItemClass",                                
                                 link_css_class => "myListItemLinkClass"
                                 ));                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-                                   
-  # an unordered list (default) and a mixture of CSS property
-  # strings and CSS classes, along with the node_formatter option
-  # so all the nodes will be formatted by this subroutine, and 
-  # even more, the form_element_formatter which can be used to
-  # create a form element after the LI tag (and if applicable
-  # before the A tag)
+
+  # mixing the CSS properties and CSS classes                                   
   my $tree_view = Tree::Simple::View::DHTML->new($tree => (
                                 list_css => "list-style: circle;",
                                 list_item_css => "font-family: courier;",
                                 expanded_item_css_class => "myExpandedListItemClass",                                
                                 link_css_class => "myListItemLinkClass"                                  
+                                # format complex nodes with a function
                                 node_formatter => sub {
                                     my ($tree) = @_;
-                                    return "<B>" . $tree->description() . "</B>";
+                                    return "<B>" . $tree->getNodeValue()->description() . "</B>";
                                     },
+                                # add a form element to the tree
                                 form_element_formatter => sub {
                                     my ($tree) = @_;
-                                    return "<INPUT TYPE='radio' NAME='tree_id' VALUE='" . $tree->id . "'>";
+                                    return "<INPUT TYPE='radio' NAME='tree_id' VALUE='" . $tree->getNodeValue()->id() . "'>";
                                     }    
                                 ));  
 

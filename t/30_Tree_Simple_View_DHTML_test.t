@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 31;
 
 BEGIN { 
     use_ok('Tree::Simple::View::DHTML');
@@ -127,6 +127,46 @@ EXPECTED
     is($output, $expected, '... got what we expected');
 }
 
+{
+    my $tree_view = Tree::Simple::View::DHTML->new($tree);
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    my $output = $tree_view->expandPath();
+    ok($output, '... make sure we got some output');
+
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
+    my $expected = <<EXPECTED;
+<UL>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
+<UL ID='${view_id}_1' STYLE='display: none;'>
+<LI>1.1</LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<UL ID='${view_id}_2' STYLE='display: none;'>
+<LI>1.2.1</LI>
+<LI>1.2.2</LI>
+</UL>
+<LI>1.3</LI>
+</UL>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
+<UL ID='${view_id}_3' STYLE='display: none;'>
+<LI>2.1</LI>
+<LI>2.2</LI>
+</UL>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
+<UL ID='${view_id}_4' STYLE='display: none;'>
+<LI>3.1</LI>
+<LI>3.2</LI>
+<LI>3.3</LI>
+</UL>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
+<UL ID='${view_id}_5' STYLE='display: none;'>
+<LI>4.1</LI>
+</UL></UL>
+EXPECTED
+
+    chomp $expected;
+    is($output, $expected, '... got what we expected');
+}
 
 {
     my $tree_view = Tree::Simple::View::DHTML->new($tree, (list_type => "ordered"));
@@ -212,8 +252,11 @@ EXPECTED
 
 {
     my $tree_view = Tree::Simple::View::DHTML->new($tree, 
-                                list_type => "unordered",
                                 list_css => "list-style: circle;",
+                                list_item_css => "font-family: sans-serif;",
+                                expanded_item_css => "font-weight: bold;",
+                                link_css => "text-decoration: none;",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" } 
                                 );
     isa_ok($tree_view, 'Tree::Simple::View::DHTML');
     
@@ -223,30 +266,30 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
     my $expected = <<EXPECTED;
 <UL STYLE='list-style: circle;'>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1 Level</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_1'>
-<LI>1.1</LI>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI STYLE='font-family: sans-serif;'>1.1 Level</LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2 Level</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_2'>
-<LI>1.2.1</LI>
-<LI>1.2.2</LI>
+<LI STYLE='font-family: sans-serif;'>1.2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>1.2.2 Level</LI>
 </UL>
-<LI>1.3</LI>
+<LI STYLE='font-family: sans-serif;'>1.3 Level</LI>
 </UL>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2 Level</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_3'>
-<LI>2.1</LI>
-<LI>2.2</LI>
+<LI STYLE='font-family: sans-serif;'>2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>2.2 Level</LI>
 </UL>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3 Level</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_4'>
-<LI>3.1</LI>
-<LI>3.2</LI>
-<LI>3.3</LI>
+<LI STYLE='font-family: sans-serif;'>3.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>3.2 Level</LI>
+<LI STYLE='font-family: sans-serif;'>3.3 Level</LI>
 </UL>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4 Level</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_5'>
-<LI>4.1</LI>
+<LI STYLE='font-family: sans-serif;'>4.1 Level</LI>
 </UL></UL>
 EXPECTED
 
@@ -257,8 +300,11 @@ EXPECTED
 
 {
     my $tree_view = Tree::Simple::View::DHTML->new($tree, 
-                                list_type => "unordered",
-                                list_css => "list-style: circle;",
+                                list_css => "list-style: circle",
+                                list_item_css => "font-family: sans-serif;",
+                                expanded_item_css => "font-weight: bold;",
+                                link_css => "text-decoration: none;",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" } 
                                 );
     isa_ok($tree_view, 'Tree::Simple::View::DHTML');
     
@@ -268,30 +314,126 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
     my $expected = <<EXPECTED;
 <UL STYLE='list-style: circle;'>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1 Level</A></LI>
 <UL STYLE='list-style: circle; display: block;' ID='${view_id}_1'>
-<LI>1.1</LI>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI STYLE='font-family: sans-serif;'>1.1 Level</LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2 Level</A></LI>
 <UL STYLE='list-style: circle; display: block;' ID='${view_id}_2'>
-<LI>1.2.1</LI>
-<LI>1.2.2</LI>
+<LI STYLE='font-family: sans-serif;'>1.2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>1.2.2 Level</LI>
 </UL>
-<LI>1.3</LI>
+<LI STYLE='font-family: sans-serif;'>1.3 Level</LI>
 </UL>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2 Level</A></LI>
 <UL STYLE='list-style: circle; display: none;' ID='${view_id}_3'>
-<LI>2.1</LI>
-<LI>2.2</LI>
+<LI STYLE='font-family: sans-serif;'>2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>2.2 Level</LI>
 </UL>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3 Level</A></LI>
 <UL STYLE='list-style: circle; display: none;' ID='${view_id}_4'>
-<LI>3.1</LI>
-<LI>3.2</LI>
-<LI>3.3</LI>
+<LI STYLE='font-family: sans-serif;'>3.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>3.2 Level</LI>
+<LI STYLE='font-family: sans-serif;'>3.3 Level</LI>
 </UL>
-<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI STYLE='font-weight: bold;'><A STYLE='text-decoration: none;' HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4 Level</A></LI>
 <UL STYLE='list-style: circle; display: none;' ID='${view_id}_5'>
-<LI>4.1</LI>
+<LI STYLE='font-family: sans-serif;'>4.1 Level</LI>
+</UL></UL>
+EXPECTED
+
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::DHTML->new($tree, 
+                                list_css_class => "listClass",
+                                list_item_css_class => "listItemClass",
+                                expanded_item_css_class => "expandedItemClass",
+                                link_css_class => "linkClass",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" } 
+                                );
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+    
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
+    my $expected = <<EXPECTED;
+<UL CLASS='listClass'>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1 Level</A></LI>
+<UL CLASS='listClass' ID='${view_id}_1'>
+<LI CLASS='listItemClass'>1.1 Level</LI>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2 Level</A></LI>
+<UL CLASS='listClass' ID='${view_id}_2'>
+<LI CLASS='listItemClass'>1.2.1 Level</LI>
+<LI CLASS='listItemClass'>1.2.2 Level</LI>
+</UL>
+<LI CLASS='listItemClass'>1.3 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2 Level</A></LI>
+<UL CLASS='listClass' ID='${view_id}_3'>
+<LI CLASS='listItemClass'>2.1 Level</LI>
+<LI CLASS='listItemClass'>2.2 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3 Level</A></LI>
+<UL CLASS='listClass' ID='${view_id}_4'>
+<LI CLASS='listItemClass'>3.1 Level</LI>
+<LI CLASS='listItemClass'>3.2 Level</LI>
+<LI CLASS='listItemClass'>3.3 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4 Level</A></LI>
+<UL CLASS='listClass' ID='${view_id}_5'>
+<LI CLASS='listItemClass'>4.1 Level</LI>
+</UL></UL>
+EXPECTED
+
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::DHTML->new($tree, 
+                                list_css_class => "listClass",
+                                list_item_css_class => "listItemClass",
+                                expanded_item_css_class => "expandedItemClass",
+                                link_css_class => "linkClass",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" } 
+                                );
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    my $output = $tree_view->expandPath(qw(1 1.2));
+    ok($output, '... make sure we got some output');
+    
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
+    my $expected = <<EXPECTED;
+<UL CLASS='listClass'>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: block;' ID='${view_id}_1'>
+<LI CLASS='listItemClass'>1.1 Level</LI>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: block;' ID='${view_id}_2'>
+<LI CLASS='listItemClass'>1.2.1 Level</LI>
+<LI CLASS='listItemClass'>1.2.2 Level</LI>
+</UL>
+<LI CLASS='listItemClass'>1.3 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: none;' ID='${view_id}_3'>
+<LI CLASS='listItemClass'>2.1 Level</LI>
+<LI CLASS='listItemClass'>2.2 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: none;' ID='${view_id}_4'>
+<LI CLASS='listItemClass'>3.1 Level</LI>
+<LI CLASS='listItemClass'>3.2 Level</LI>
+<LI CLASS='listItemClass'>3.3 Level</LI>
+</UL>
+<LI CLASS='expandedItemClass'><A CLASS='linkClass' HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4 Level</A></LI>
+<UL CLASS='listClass' STYLE='display: none;' ID='${view_id}_5'>
+<LI CLASS='listItemClass'>4.1 Level</LI>
 </UL></UL>
 EXPECTED
 

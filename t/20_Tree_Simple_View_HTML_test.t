@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 31;
 
 BEGIN { 
     use_ok('Tree::Simple::View::HTML');
@@ -112,6 +112,26 @@ EXPECTED
     is($output, $expected, '... got what we expected');
 }
 
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree);
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
+    my $output = $tree_view->expandPath();
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<UL>
+<LI>1</LI>
+<LI>2</LI>
+<LI>3</LI>
+<LI>4</LI>
+</UL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
 
 {
     my $tree_view = Tree::Simple::View::HTML->new($tree, (list_type => "ordered"));
@@ -182,6 +202,9 @@ EXPECTED
     my $tree_view = Tree::Simple::View::HTML->new($tree, 
                                 list_type => "unordered",
                                 list_css => "list-style: circle;",
+                                list_item_css => "font-family: sans-serif;",
+                                expanded_item_css => "font-weight: bold;",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" }                                 
                                 );
     isa_ok($tree_view, 'Tree::Simple::View::HTML');
     
@@ -190,30 +213,30 @@ EXPECTED
     
     my $expected = <<EXPECTED;
 <UL STYLE='list-style: circle;'>
-<LI>1</LI>
+<LI STYLE='font-weight: bold;'>1 Level</LI>
 <UL STYLE='list-style: circle;'>
-<LI>1.1</LI>
-<LI>1.2</LI>
+<LI STYLE='font-family: sans-serif;'>1.1 Level</LI>
+<LI STYLE='font-weight: bold;'>1.2 Level</LI>
 <UL STYLE='list-style: circle;'>
-<LI>1.2.1</LI>
-<LI>1.2.2</LI>
+<LI STYLE='font-family: sans-serif;'>1.2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>1.2.2 Level</LI>
 </UL>
-<LI>1.3</LI>
+<LI STYLE='font-family: sans-serif;'>1.3 Level</LI>
 </UL>
-<LI>2</LI>
+<LI STYLE='font-weight: bold;'>2 Level</LI>
 <UL STYLE='list-style: circle;'>
-<LI>2.1</LI>
-<LI>2.2</LI>
+<LI STYLE='font-family: sans-serif;'>2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>2.2 Level</LI>
 </UL>
-<LI>3</LI>
+<LI STYLE='font-weight: bold;'>3 Level</LI>
 <UL STYLE='list-style: circle;'>
-<LI>3.1</LI>
-<LI>3.2</LI>
-<LI>3.3</LI>
+<LI STYLE='font-family: sans-serif;'>3.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>3.2 Level</LI>
+<LI STYLE='font-family: sans-serif;'>3.3 Level</LI>
 </UL>
-<LI>4</LI>
+<LI STYLE='font-weight: bold;'>4 Level</LI>
 <UL STYLE='list-style: circle;'>
-<LI>4.1</LI>
+<LI STYLE='font-family: sans-serif;'>4.1 Level</LI>
 </UL></UL>
 EXPECTED
     chomp $expected;
@@ -223,8 +246,10 @@ EXPECTED
 
 {
     my $tree_view = Tree::Simple::View::HTML->new($tree, 
-                                list_type => "unordered",
-                                list_css => "list-style: circle;",
+                                list_css => "list-style: circle",
+                                list_item_css => "font-family: sans-serif;",
+                                expanded_item_css => "font-weight: bold;",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" }                                
                                 );
     isa_ok($tree_view, 'Tree::Simple::View::HTML');
     
@@ -233,14 +258,90 @@ EXPECTED
     
     my $expected = <<EXPECTED;
 <UL STYLE='list-style: circle;'>
-<LI>1</LI>
-<LI>2</LI>
+<LI STYLE='font-family: sans-serif;'>1 Level</LI>
+<LI STYLE='font-weight: bold;'>2 Level</LI>
 <UL STYLE='list-style: circle;'>
-<LI>2.1</LI>
-<LI>2.2</LI>
+<LI STYLE='font-family: sans-serif;'>2.1 Level</LI>
+<LI STYLE='font-family: sans-serif;'>2.2 Level</LI>
 </UL>
-<LI>3</LI>
-<LI>4</LI>
+<LI STYLE='font-family: sans-serif;'>3 Level</LI>
+<LI STYLE='font-family: sans-serif;'>4 Level</LI>
+</UL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree, 
+                                list_type => "ordered",
+                                list_css_class => "listClass",
+                                list_item_css_class => "listItemClass",
+                                expanded_item_css_class => "expandedItemClass",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" }                                 
+                                );
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<OL CLASS='listClass'>
+<LI CLASS='expandedItemClass'>1 Level</LI>
+<OL CLASS='listClass'>
+<LI CLASS='listItemClass'>1.1 Level</LI>
+<LI CLASS='expandedItemClass'>1.2 Level</LI>
+<OL CLASS='listClass'>
+<LI CLASS='listItemClass'>1.2.1 Level</LI>
+<LI CLASS='listItemClass'>1.2.2 Level</LI>
+</OL>
+<LI CLASS='listItemClass'>1.3 Level</LI>
+</OL>
+<LI CLASS='expandedItemClass'>2 Level</LI>
+<OL CLASS='listClass'>
+<LI CLASS='listItemClass'>2.1 Level</LI>
+<LI CLASS='listItemClass'>2.2 Level</LI>
+</OL>
+<LI CLASS='expandedItemClass'>3 Level</LI>
+<OL CLASS='listClass'>
+<LI CLASS='listItemClass'>3.1 Level</LI>
+<LI CLASS='listItemClass'>3.2 Level</LI>
+<LI CLASS='listItemClass'>3.3 Level</LI>
+</OL>
+<LI CLASS='expandedItemClass'>4 Level</LI>
+<OL CLASS='listClass'>
+<LI CLASS='listItemClass'>4.1 Level</LI>
+</OL></OL>
+EXPECTED
+    chomp $expected;
+    
+    is($output, $expected, '... got what we expected');
+}
+
+{
+    my $tree_view = Tree::Simple::View::HTML->new($tree, 
+                                list_css_class => "listClass",
+                                list_item_css_class => "listItemClass",
+                                expanded_item_css_class => "expandedItemClass",
+                                node_formatter => sub { $_[0]->getNodeValue() . " Level" }                                
+                                );
+    isa_ok($tree_view, 'Tree::Simple::View::HTML');
+    
+    my $output = $tree_view->expandPath(2);
+    ok($output, '... make sure we got some output');
+    
+    my $expected = <<EXPECTED;
+<UL CLASS='listClass'>
+<LI CLASS='listItemClass'>1 Level</LI>
+<LI CLASS='expandedItemClass'>2 Level</LI>
+<UL CLASS='listClass'>
+<LI CLASS='listItemClass'>2.1 Level</LI>
+<LI CLASS='listItemClass'>2.2 Level</LI>
+</UL>
+<LI CLASS='listItemClass'>3 Level</LI>
+<LI CLASS='listItemClass'>4 Level</LI>
 </UL>
 EXPECTED
     chomp $expected;

@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -62,7 +62,7 @@ __END__
 
 =head1 NAME
 
-Tree::Simple::View - A set of classes for viewing Tree::Simple hierarchies in various output formats
+Tree::Simple::View - A base for a set of classes used for viewing Tree::Simple hierarchies in various output formats
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,9 @@ Tree::Simple::View - A set of classes for viewing Tree::Simple hierarchies in va
 
 This serves as an abstract base class to the Tree::Simple::View::* classes. There are two implementing classes included here; Tree::Simple::View::HTML and Tree::Simple::View::DHTML. Other Tree::Simple::View::* classes are also being planned, see the L<TO DO> section for more information.
 
-This is still an early release of this set of modules, and therefore it is not totally "complete". That is not to say it isn't usable. It is based on some older tree formatting code I had lying around but had never properly modularized. However, I will be using these modules in a production system in the upcoming months, so you can expect many updates which should provide increases in both performance and reliability. My recommendation is not to use this in your production systems as yet, however, if you are interested in this module and would eventually like to use it, please email me and I will do my best to help out.
+These modules are pretty close to being complete at this point. The API is stable and should not change, although some more configuration options may get added, none will be deleted. We are currently using the Tree::Simple::DHTML module on a project which will soon go through QA and into production, which will help us find lingering any bugs and/or browser issues. The plan is to release this as 1.0 once we move this site into production.
+
+I have run some I<rough> benchmarks on my Powerbook (500 mHz G4 w/ 512K of RAM) running OS X (10.3.4). I used a 1200+ node Tree::Simple hierarchy and tested it with range of configuration options. For simple (no configuration) rendering it was able to render approx. 15 times a second. For more complex renderings (with a configuration), it was able to render approx. 10 times a second. Interestingly enough, no matter home complex the configuration, the render time remained pretty much constant. I expect these numbers would be much higher if I had run them our webserver (usually Linux running on P3 or P4 and min. 1 GB of RAM), and I will include more thorough benchmark stats in the 1.0 release documentation. 
 
 =head1 METHODS
 
@@ -197,10 +199,6 @@ To view a demo of the Tree::Simple::View::DHTML functionality, look in the C<exa
 
 =over 5
 
-=item B<More Tests>
-
-I have written several new tests for this release, and coverage is now at 91.2%, mostly it is the branch coverage that is poor. But even that is somewhat misleading since there is some code contained in dynamically generated strings whose coverage is never (and I don't think can ever) be tested. Eventually, I will be adding more tests to exercise these subroutines as well as fill in all the missing branch coverage.
-
 =item B<Adding new Tree::Simple::View::* classes>
 
 I have an Tree::Simple::View::ASCII class in the works, which will output Trees in plain text, and optionally support ANSI colors for terminal output. (NOTE: This may end up being just a thin wrapper around Data::TreeDumper's output, see L<SEE ALSO> section below).
@@ -224,17 +222,15 @@ I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Deve
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
  File                                 stmt branch   cond    sub    pod   time  total
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- /Tree/Simple/View.pm                100.0  100.0   77.8  100.0  100.0    2.6   97.1
- /Tree/Simple/View/DHTML.pm           96.7   46.4  100.0  100.0  100.0    8.4   89.4
- /Tree/Simple/View/HTML.pm            91.6   45.0   60.0  100.0  100.0    9.1   80.8
- t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a   24.0  100.0
- t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   40.4  100.0
- t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   15.6  100.0
+ /Tree/Simple/View.pm                100.0  100.0   77.8  100.0  100.0    0.8   97.1
+ /Tree/Simple/View/DHTML.pm          100.0   57.7  100.0  100.0  100.0   31.3   93.8
+ /Tree/Simple/View/HTML.pm            99.1   72.2   66.7  100.0  100.0   11.6   91.6
+ t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a   16.3  100.0
+ t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   11.7  100.0
+ t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   28.2  100.0
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                                97.0   51.3   73.3  100.0  100.0  100.0   91.2
+ Total                                99.8   70.0   76.7  100.0  100.0  100.0   96.0
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
-
-NOTE: There are a few dynamically compiled subroutines which are created from evaled strings. The coverage of these subroutines is not test (and I am not sure it can be), so the numbers here are somewhat misleading. Extensively testing this code however is on the L<TO DO> list.
 
 =head1 SEE ALSO
 
