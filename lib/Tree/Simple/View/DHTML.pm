@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 

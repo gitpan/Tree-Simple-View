@@ -1,5 +1,10 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.09 Mon Aug 2 2004
+    - I forgot to change the version requirements for 
+      Tree::Simple to 1.07 which is the first version 
+      that uses the getUID methods.
+
 0.08 Sun Aug 1 2004
     - Changed the way that the DHTML DIV IDs were being
       created, you can now use your own UID from the
