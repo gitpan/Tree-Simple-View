@@ -4,7 +4,7 @@ package Tree::Simple::View::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -62,7 +62,7 @@ __END__
 
 =head1 NAME
 
-Tree::Simple::View::Base - An abstract base class for viewing Tree::Simple heirarchies
+Tree::Simple::View::Base - An abstract base class for viewing Tree::Simple hierarchies
 
 =head1 SYNOPSIS
 

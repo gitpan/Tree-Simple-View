@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::Base;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @ISA = qw(Tree::Simple::View::Base);
 
@@ -147,7 +147,9 @@ sub _processListConfig {
 
     my $list_css = "";
     if (exists $config{list_css}) {
-        $list_css = " STYLE='" . $config{list_css} . "'";
+        my $_list_css = $config{list_css};
+        $_list_css .= ";" unless ($_list_css =~ /\;$/);        
+        $list_css = " STYLE='${_list_css}'";
     }
     elsif (exists $config{list_css_class}) {
         $list_css = " CLASS='" . $config{list_css_class} . "'";
@@ -183,7 +185,9 @@ sub _processListItemConfig {
 
     my $expanded_item_css = "";
     if (exists $config{expanded_item_css}) {
-        $expanded_item_css = " STYLE='" . $config{expanded_item_css} . "'";
+        my $_expanded_item_css = $config{expanded_item_css};
+        $_expanded_item_css .= ";" unless ($_expanded_item_css =~ /\;$/);    
+        $expanded_item_css = " STYLE='${_expanded_item_css}'";
     }
     elsif (exists $config{expanded_item_css_class}) {
         $expanded_item_css = " CLASS='" . $config{expanded_item_css_class} . "'";
@@ -211,7 +215,7 @@ __END__
 
 =head1 NAME
 
-Tree::Simple::View::HTML - A class for viewing Tree::Simple heirarchies in HTML
+Tree::Simple::View::HTML - A class for viewing Tree::Simple hierarchies in HTML
 
 =head1 SYNOPSIS
 
@@ -266,7 +270,7 @@ Tree::Simple::View::HTML - A class for viewing Tree::Simple heirarchies in HTML
 
 =head1 DESCRIPTION
 
-This is a class for use with Tree::Simple object heirarchies to serve as a means of displaying them in HTML. It is the "View", while the Tree::Simple object heirarchy would be the "Model" in your standard Model-View-Controller paradigm. 
+This is a class for use with Tree::Simple object hierarchies to serve as a means of displaying them in HTML. It is the "View", while the Tree::Simple object hierarchy would be the "Model" in your standard Model-View-Controller paradigm. 
 
 This class outputs fairly vanilla HTML in its simpliest configuration, suitable for both legacy browsers and text-based browsers. Through the use of various configuration options, CSS can be applied to support more advanced browsers but still degrade gracefully to legacy browsers. 
 

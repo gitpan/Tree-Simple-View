@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $VIEW_TYPE = "HTML";
 
@@ -22,13 +22,14 @@ sub new {
     return $view_type->new(@_);
 }
 
+
 1;
 
 __END__
 
 =head1 NAME
 
-Tree::Simple::View - A class for viewing Tree::Simple heirarchies in various formats
+Tree::Simple::View - A class for viewing Tree::Simple hierarchies in various formats
 
 =head1 SYNOPSIS
 
@@ -54,6 +55,10 @@ Depending upon the value given in the C<use> statement, this will return an inst
 
 =back
 
+=head1 DEMO
+
+To view a demo of the Tree::Simple::View::DHTML functionality, look in the C<examples/> directory.
+
 =head1 TO DO
 
 =over 5
@@ -61,10 +66,6 @@ Depending upon the value given in the C<use> statement, this will return an inst
 =item B<More Tests>
 
 We could use some more tests, to help increase the coverage (which is only at 70.9% right now). Normally I would not release a module with coverage this low, but I need to get back to working on a project for a client (for which this module was created). But because I will be using this module in this project, I know I will be able to improve the test suite as I go.
-
-=item B<get a demo up for people to see> 
-
-I would like to link to a demo of the DHTML in particular, I have to find space on the company web server for that though.
 
 =item B<Adding new Tree::Simple::View::* classes>
 
@@ -108,15 +109,19 @@ There are a few modules out there that I have seen which do similar things to th
 
 =item B<HTML::PopupTreeSelect>
 
-This module implements a DHTML "pop-up" dialog which contains an expand-collapse tree, which can be used for selecting an item from a heirarchy. It looks to me to be very configurable and have all its bases covered, right down to handling some of the uglies of cross-browser/cross-platform DHTML. However it is really for a very specific purpose, and not for general tree display like this module. 
+This module implements a DHTML "pop-up" dialog which contains an expand-collapse tree, which can be used for selecting an item from a hierarchy. It looks to me to be very configurable and have all its bases covered, right down to handling some of the uglies of cross-browser/cross-platform DHTML. However it is really for a very specific purpose, and not for general tree display like this module. 
 
-=item B<HTML-TreeStructured>
+=item B<HTML::TreeStructured>
 
 This module actually seems to do something very similar to these modules, but to be honest, the documentation is very, very sparse, and so I am not really sure how to go about using it. From a quick read of the code it seems to use HTML::Template as its base, but after that I am not sure. 
 
 =item B<CGI::Explorer>
 
 This module is similar to the HTML::PopupTreeSelect, in that it is intended for a more singular purpose. This module implements a Windows-style explorer tree.
+
+=item B<Data::TreeDumper>
+
+This module is an alternative to Data::Dumper for dumping out tree structures. As the author points out, the output of Data::Dumper when dealing with tree structures can be difficult to read at best. This module solves that problem by dumping a much more readable and understandable output for tree data-structres. There are a lot of options for output, including custom output filters, so it is concievable that you could produce similar output to this module's with Data::TreeDumper. However, the central goal of Data::TreeDumper is more for viewing of data structures by developers and not for UI output (which Tree::Simple::View is for). 
 
 =back
 

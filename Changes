@@ -1,5 +1,15 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.03 Wed Jun 23 2004
+    - fixed a number of little issues with the DHTML class
+        - fixed problems with combined CSS configurations
+          and the expand-collapse functionality
+        - fixed a bug whereby expandPath did not work
+          properly
+    - added an example file of the DHTML output 
+      (examples/DHTML_example.html)
+    - added some documentation here and there
+
 0.02 Tues Jun 22 2004
     - added simple accessors for the tree and configurations
       to the Base class

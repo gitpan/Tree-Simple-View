@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -34,7 +34,7 @@ sub expandPathSimple  {
         my $display_style = "none";        
         if (defined $current_path && $current_path eq $t->getNodeValue()) {
             $display_style = "block";
-            $current_path = pop @path;
+            $current_path = shift @path;
         }
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
@@ -69,7 +69,7 @@ sub expandPathComplex {
         my $display_style = "none";        
         if (defined $current_path && $current_path eq $t->getNodeValue()) {
             $display_style = "block";
-            $current_path = pop @path;
+            $current_path = shift @path;
         }        
         my $current_depth = $t->getDepth();
         push @results => ($list_func->(CLOSE_TAG) x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
@@ -152,10 +152,13 @@ use constant LIST_FUNCTION_CODE_STRING => q|
         # test the most functional first
         if ($tag_type == OPEN_TAG && $list_id && $display_style) {
             my $temp_list_css;
-            if ($list_css) {
+            if ($list_css && $list_css !~ /CLASS/) {
                 $temp_list_css = $list_css;
                 chop($temp_list_css);            
                 $temp_list_css .= " display: $display_style;'";
+            }
+            elsif ($list_css) {
+                $temp_list_css = "${list_css} STYLE='display: $display_style;'"
             }
             else {
                 $temp_list_css = " STYLE='display: $display_style;'"
@@ -177,7 +180,9 @@ sub _buildListItemFunction {
     
     my $link_css = "";
     if (exists $config{link_css}) {
-        $link_css = " STYLE='" . $config{link_css} . "'";
+        my $_link_css = $config{link_css};
+        $_link_css .= ";" unless ($_link_css =~ /\;$/);    
+        $link_css = " STYLE='${_link_css}'";    
     }
     elsif (exists $config{link_css_class}) {
         $link_css = " CLASS='" . $config{link_css_class} . "'";
@@ -231,7 +236,7 @@ __END__
 
 =head1 NAME
 
-Tree::Simple::View::DHTML - A class for viewing Tree::Simple heirarchies in DHTML
+Tree::Simple::View::DHTML - A class for viewing Tree::Simple hierarchies in DHTML
 
 =head1 SYNOPSIS
 
@@ -303,7 +308,7 @@ Tree::Simple::View::DHTML - A class for viewing Tree::Simple heirarchies in DHTM
 
 =head1 DESCRIPTION
 
-This is a class for use with Tree::Simple object heirarchies to serve as a means of displaying them in DHTML. It is the "View", while the Tree::Simple object heirarchy would be the "Model" in your standard Model-View-Controller paradigm. 
+This is a class for use with Tree::Simple object hierarchies to serve as a means of displaying them in DHTML. It is the "View", while the Tree::Simple object hierarchy would be the "Model" in your standard Model-View-Controller paradigm. 
 
 This class outputs fairly vanilla HTML, which is augmented with CSS and javascript to produce an expanding and collapsing tree widget. The javascript code used is intentionally very simple, and makes no attempt to do anything but expand and collapse the tree. The javascript code is output seperately from the actual tree, and so it can be overridden to implement more complex behaviors if you like. see the documentation for the C<javascript> method for more details.
 
