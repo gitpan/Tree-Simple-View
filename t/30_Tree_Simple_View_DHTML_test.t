@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 43;
+use Test::More tests => 46;
 
 BEGIN { 
     use_ok('Tree::Simple::View::DHTML');
@@ -622,5 +622,38 @@ EXPECTED
     chomp $expected;
     
     is($output, $expected, '... got what we expected');
+}
+
+
+{
+
+    my $tree = Tree::Simple->new(Tree::Simple->ROOT)
+                       ->addChildren(
+                            Tree::Simple->new("1")->addChild(Tree::Simple->new("1.1")),
+                            Tree::Simple->new("2")
+                       );
+                       
+    my $tree_id = $tree->getChild(0)->getUID();
+
+    my $tree_view = Tree::Simple::View::DHTML->new($tree, (use_tree_uids => 1));
+    isa_ok($tree_view, 'Tree::Simple::View::DHTML');
+    
+    my $output = $tree_view->expandAll();
+    ok($output, '... make sure we got some output');
+
+    my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
+    my $expected = <<EXPECTED;
+<UL>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("$tree_id")'>1</A></LI>
+<UL ID='$tree_id'>
+<LI>1.1</LI>
+</UL>
+<LI>2</LI>
+</UL>
+EXPECTED
+
+    chomp $expected;
+    is($output, $expected, '... got what we expected');
+                       
 }
 

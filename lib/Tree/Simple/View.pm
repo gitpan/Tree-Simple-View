@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my ($_class, $tree, %configuration) = @_;
@@ -24,7 +24,7 @@ sub _init {
         || die "Insufficient Arguments : tree argument must be a Tree::Simple object";
     $self->{tree} = $tree;
     $self->{config} = \%config if %config;
-    $self->{include_trunk} = 0;
+    $self->{include_trunk} = 0; 
 }
 
 sub getTree {
@@ -212,11 +212,13 @@ To view a demo of the Tree::Simple::View::DHTML functionality, look in the C<exa
 
 =item B<Test improvement>
 
-Right now the tests really are not as well designed as they could be. There are a number of odd corners and edge cases which are not being tested well enough (this release (0.07) actually lost some coverage since I don't have time to properly design these tests). I am thinking when I do a 1.0 release I will sit down and really plan out a good set of test that will execise all interactions/interminglings/dark-corners/etc of the code.
+Right now the tests really are not as well designed as they could be. There are a number of odd corners and edge cases which are not being tested well enough (this release (0.08) actually lost some coverage since I don't have time to properly design these tests). I am thinking when I do a 1.0 release I will sit down and really plan out a good set of test that will execise all interactions/interminglings/dark-corners/etc of the code.
 
 =item B<Adding new Tree::Simple::View::* classes>
 
-I have been fiddling around with a class which outputs GraphViz .dot files. I am not sure what to call it though; Tree::Simple::View::GraphViz or Tree::Simple::View::Dot. 
+I<NOTE: In thinking more about some of these items, I have decided they are not "Views" in the MVC sense of the word. And since that is somewhat what I was going for, I am reconsidering including them in this module.>
+
+I have been fiddling around with a class which outputs GraphViz .dot files. I am not sure what to call it though; Tree::Simple::View::GraphViz or Tree::Simple::View::Dot.
 
 I have an Tree::Simple::View::ASCII class in the works, which will output Trees in plain text, and optionally support ANSI colors for terminal output. (NOTE: This may end up being just a thin wrapper around Data::TreeDumper's output, see L<SEE ALSO> section below).
 
@@ -240,18 +242,20 @@ None that I am aware of. Of course, if you find a bug, let me know, and I will b
 
 I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Devel::Cover> report on this module test suite.
 
- ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- File                                 stmt branch   cond    sub    pod   time  total
- ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- /Tree/Simple/View.pm                100.0   83.3   77.8  100.0  100.0    1.6   95.0
- /Tree/Simple/View/DHTML.pm          100.0   73.8  100.0  100.0  100.0   24.3   94.6
- /Tree/Simple/View/HTML.pm            98.5   73.1   62.5  100.0  100.0   25.0   89.4
- t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a   24.0  100.0
- t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   12.4  100.0
- t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   12.8  100.0
- ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                                99.7   74.5   71.8  100.0  100.0  100.0   95.5
- ---------------------------------- ------ ------ ------ ------ ------ ------ ------
+ --------------------------------- ------ ------ ------ ------ ------ ------ ------
+ File                                stmt branch   cond    sub    pod   time  total
+ --------------------------------- ------ ------ ------ ------ ------ ------ ------
+ /Tree/Simple/View.pm               100.0   83.3   77.8  100.0  100.0    3.8   95.0
+ /Tree/Simple/View/DHTML.pm         100.0   75.0  100.0  100.0  100.0   22.4   94.7
+ /Tree/Simple/View/HTML.pm           98.5   73.1   62.5  100.0  100.0   37.4   89.4
+ t/10_Tree_Simple_View_test.t       100.0    n/a    n/a  100.0    n/a   27.6  100.0
+ t/20_Tree_Simple_View_HTML_test.t  100.0    n/a    n/a  100.0    n/a    2.0  100.0
+ t/30_Tree_Simple_View_DHTML_test.t 100.0    n/a    n/a  100.0    n/a    5.0  100.0
+ t/pod.t                            100.0   50.0    n/a  100.0    n/a    0.9   95.2
+ t/pod_coverage.t                   100.0   50.0    n/a  100.0    n/a    0.9   95.2 
+ --------------------------------- ------ ------ ------ ------ ------ ------ ------
+ Total                               99.7   74.1   71.8  100.0  100.0  100.0   95.5
+ --------------------------------- ------ ------ ------ ------ ------ ------ ------
 
 =head1 SEE ALSO
 

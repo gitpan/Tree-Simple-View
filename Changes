@@ -1,5 +1,12 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.08 Sun Aug 1 2004
+    - Changed the way that the DHTML DIV IDs were being
+      created, you can now use your own UID from the
+      Tree::Simple object instead, thanks to 
+      Brett Nuske for that suggestion.
+      - documented and tested it
+
 0.07 Thurs July 15 2004
     - added includeTrunk method, and implemented the
       necessary functionality in ::HTML and ::DHTML.

@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -18,7 +18,15 @@ use constant EXPANDED => 3;
 sub _init {
     my ($self, @args) = @_;
     $self->SUPER::_init(@args);
-    $self->{list_counter_id} = 1;
+    $self->{list_counter_id} = 0;
+    ($self->{obj_id}) = ("$self" =~ /\((.*?)\)$/);
+}
+
+sub _createUID {
+    my ($self, $tree) = @_;
+    return $tree->getUID() if $self->{config}->{use_tree_uids};
+    $self->{list_counter_id}++;
+    return join "_" => ($self->{obj_id}, $self->{list_counter_id});
 }
 
 ## public methods
@@ -27,7 +35,6 @@ sub expandPathSimple  {
     my ($self, $tree, $current_path, @path) = @_;
     my @results = ("<UL>");
     my $root_depth = $tree->getDepth() + 1;  
-    my ($tree_id) = ("$self" =~ /\((.*?)\)$/);
     my $last_depth = -1;
     my $traversal_sub = sub {
         my ($t) = @_;
@@ -39,10 +46,10 @@ sub expandPathSimple  {
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         unless ($t->isLeaf()) {
-            push @results => ("<LI><A HREF='javascript:void(0);' onClick='toggleList(\"${tree_id}_" . $self->{list_counter_id}. "\")'>" . 
+            my $uid = $self->_createUID($t);
+            push @results => ("<LI><A HREF='javascript:void(0);' onClick='toggleList(\"$uid\")'>" . 
                                 $t->getNodeValue() . "</A></LI>");            
-            push @results => "<UL ID='${tree_id}_" . $self->{list_counter_id} . "' STYLE='display: $display_style;'>"; 
-            $self->{list_counter_id}++;       
+            push @results => "<UL ID='$uid' STYLE='display: $display_style;'>";     
         }
         else {
             push @results => ("<LI>" . $t->getNodeValue() . "</LI>");
@@ -64,8 +71,7 @@ sub expandPathComplex {
     my ($list_func, $list_item_func) = $self->_processConfig($config);   
     
     my @results = $list_func->(OPEN_TAG);
-    my $root_depth = $tree->getDepth() + 1;  
-    my ($tree_id) = ("$self" =~ /\((.*?)\)$/);      
+    my $root_depth = $tree->getDepth() + 1;       
     my $last_depth = -1;
     my $traversal_sub = sub {
         my ($t) = @_;
@@ -77,9 +83,9 @@ sub expandPathComplex {
         my $current_depth = $t->getDepth();
         push @results => ($list_func->(CLOSE_TAG) x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         unless ($t->isLeaf()) {
-            push @results => ($list_item_func->($t, EXPANDED, ("${tree_id}_" . $self->{list_counter_id})));                                           
-            push @results => $list_func->(OPEN_TAG, ("${tree_id}_" . $self->{list_counter_id}), $display_style); 
-            $self->{list_counter_id}++;       
+            my $uid = $self->_createUID($t);
+            push @results => ($list_item_func->($t, EXPANDED, $uid));                                           
+            push @results => $list_func->(OPEN_TAG, $uid, $display_style); 
         }
         else {
             push @results => ($list_item_func->($t));
@@ -97,18 +103,17 @@ sub expandPathComplex {
 sub expandAllSimple  {
     my ($self) = @_;   
     my @results = ("<UL>");
-    my $root_depth = $self->{tree}->getDepth() + 1;  
-    my ($tree_id) = ("$self" =~ /\((.*?)\)$/);
+    my $root_depth = $self->{tree}->getDepth() + 1;    
     my $last_depth = -1;
     my $traversal_sub = sub {
         my ($t) = @_;
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         unless ($t->isLeaf()) {
-            push @results => ("<LI><A HREF='javascript:void(0);' onClick='toggleList(\"${tree_id}_" . $self->{list_counter_id}. "\")'>" . 
+            my $uid = $self->_createUID($t);
+            push @results => ("<LI><A HREF='javascript:void(0);' onClick='toggleList(\"$uid\")'>" . 
                                 $t->getNodeValue() . "</A></LI>");            
-            push @results => "<UL ID='${tree_id}_" . $self->{list_counter_id} . "'>"; 
-            $self->{list_counter_id}++;       
+            push @results => "<UL ID='$uid'>";     
         }
         else {
             push @results => ("<LI>" . $t->getNodeValue() . "</LI>");
@@ -129,17 +134,16 @@ sub expandAllComplex {
     my ($list_func, $list_item_func) = $self->_processConfig($config);   
     
     my @results = $list_func->(OPEN_TAG);
-    my $root_depth = $self->{tree}->getDepth() + 1;  
-    my ($tree_id) = ("$self" =~ /\((.*?)\)$/);      
+    my $root_depth = $self->{tree}->getDepth() + 1;        
     my $last_depth = -1;
     my $traversal_sub = sub {
         my ($t) = @_;
         my $current_depth = $t->getDepth();
         push @results => ($list_func->(CLOSE_TAG) x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         unless ($t->isLeaf()) {
-            push @results => ($list_item_func->($t, EXPANDED, ("${tree_id}_" . $self->{list_counter_id})));                                           
-            push @results => $list_func->(OPEN_TAG, ("${tree_id}_" . $self->{list_counter_id})); 
-            $self->{list_counter_id}++;       
+            my $uid = $self->_createUID($t);        
+            push @results => ($list_item_func->($t, EXPANDED, $uid));                                           
+            push @results => $list_func->(OPEN_TAG, $uid); 
         }
         else {
             push @results => ($list_item_func->($t));
@@ -368,6 +372,10 @@ This can be a CODE reference which will be given the current tree object as its 
 =item I<form_element_formatter>
 
 This can be a CODE reference which will be given the current tree object as its only argument. The output of this subroutine will be placed after the list item (C<LI>) tags, and if applicable, before the the link tag (C<A>). This option can be used to add a form element such a radio button or checkbox to each element of the tree, which is useful when creating selection widgets. 
+
+=item I<use_tree_uids>
+
+This item allows you to bypass the built in unique ID generation feature of this module and instead use the unique ID from the Tree::Simple object itself (gotten by calling the method C<getUID>). 
 
 =back
 
