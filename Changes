@@ -1,5 +1,25 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.04 Fri Jun 25 2004
+    !*!*!*! MAJOR UPDATE !*!*!*!
+    - My orginal vision for Tree::Simple::View was that of
+      a Proxy/Factory/I-Dont-Know-What-I-Was-Thinking class.
+      But the idea really wasn't that good, matter of fact
+      it was pretty bad. So this version marks a major update
+      to the module, the details of which are below.
+      - Tree::Simple::View::Base has been removed, its code
+        has been moved to Tree::Simple::View.
+      - Tree::Simple::View is no longer a "Proxy" class (not
+        that it ever really was) for the Tree::Simple::View::*
+        classes. It now is the abstract base class, taking on
+        the role that Tree::Simple::View::Base once served.
+      - Tree::Simple::View::HTML has been updated to reflect 
+        its new base class. (Tree::Simple::View::DHTML is a 
+        subclass of Tree::Simple::View::HTML, so it didn't need
+        to be changed). 
+      - All documentation has been updated to reflect these changes.
+    - I have added a bunch of tests while I was at it.
+
 0.03 Wed Jun 23 2004
     - fixed a number of little issues with the DHTML class
         - fixed problems with combined CSS configurations

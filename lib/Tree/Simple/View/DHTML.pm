@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -320,7 +320,7 @@ It should be noted that each expandable/collapsable level is tagged with a uniqu
 
 =item B<new ($tree, %configuration)>
 
-Accepts a C<$tree> argument of a Tree::Simple object (or one derived from Tree::Simple). This C<$tree> object does not need to be a ROOT, you can start at any level of the tree you desire. The options in the C<%config> argument are as follows:
+Accepts a C<$tree> argument of a Tree::Simple object (or one derived from Tree::Simple), if C<$tree> is not a Tree::Simple object, and exception is thrown. This C<$tree> object does not need to be a ROOT, you can start at any level of the tree you desire. The options in the C<%config> argument are as follows:
 
 =over 4
 
@@ -388,7 +388,6 @@ This method will return a string of HTML which will represent your tree expanded
               Simple
                   View.pm
                   View
-                      Base.pm
                       HTML.pm
                       DHTML.pm
       Makefile.PL
@@ -486,7 +485,7 @@ An available javascript function which would expand or collapse the entire tree.
 
 =head1 BROWSER SUPPORT
 
-While DHTML in the early days (1998-recently) was a bug ridden cross-platform/cross-browser nightmare (believe me I know, I made my living doing it back then). Recent browsers (5.0 and above) tend to be able to handle a decent sub-set of CSS1 and the javascript DOM objects to drive it. This module output DHTML which should work on any browser that supports CSS1, in particular the 'display' property, and DOM1, in particular the 'getElementById' method and the ability to manipulate the CSS 'display' property of the object that DOM method would return.
+While DHTML in the early days (1998-2001) was a bug ridden cross-platform/cross-browser nightmare (believe me I know, I made my living doing it back then). Recent browsers (5.0 and above) tend to be able to handle a decent sub-set of CSS1 and the javascript DOM objects to drive it. This module output DHTML which should work on any browser that supports CSS1, in particular the 'display' property, and DOM1, in particular the 'getElementById' method and the ability to manipulate the CSS 'display' property of the object that DOM method would return.
 
 But in case you don't care that much about CSS1 and the DOM, and just want to know what browsers/platforms this supports, here is the list (of ones I have tested so far):
 

@@ -4,24 +4,57 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
-
-my $VIEW_TYPE = "HTML";
-
-sub import {
-    shift;
-    $VIEW_TYPE = shift if @_;
-}
+our $VERSION = '0.04';
 
 sub new {
-    shift;
-    die "no Tree::Simple::View type selected" unless $VIEW_TYPE;
-    my $view_type = "Tree::Simple::View::${VIEW_TYPE}";
-    eval "use $view_type";
-    die "$view_type is not a valid view type : $@" if $@;
-    return $view_type->new(@_);
+    my ($_class, $tree, %configuration) = @_;
+    my $class = ref($_class) || $_class;
+    my $tree_view = {
+        tree => undef,
+        config => {}
+        };
+    bless($tree_view, $class);
+    $tree_view->_init($tree, %configuration);
+    return $tree_view;
 }
 
+sub _init {
+    my ($self, $tree, %config) = @_;
+    (defined($tree) && ref($tree) && UNIVERSAL::isa($tree, "Tree::Simple"))
+        || die "Insufficient Arguments : tree argument must be a Tree::Simple object";
+    $self->{tree} = $tree;
+    $self->{config} = \%config if %config;
+}
+
+sub getTree {
+    my ($self) = @_;
+    return $self->{tree};
+}
+
+sub getConfig {
+    my ($self) = @_;
+    return $self->{config};
+}
+
+sub expandPath {
+    my ($self, @path) = @_;
+    return $self->expandPathComplex($self->{tree}, $self->{config}, @path) if (keys %{$self->{config}});
+    return $self->expandPathSimple($self->{tree}, @path);    
+}
+
+# override these method
+sub expandPathSimple  { die "Method Not Implemented" }
+sub expandPathComplex { die "Method Not Implemented" }
+
+sub expandAll {
+    my ($self) = @_;
+    return $self->expandAllComplex($self->{config}) if (keys %{$self->{config}});
+    return $self->expandAllSimple();    
+}
+
+# override these method
+sub expandAllSimple  { die "Method Not Implemented" }
+sub expandAllComplex { die "Method Not Implemented" }
 
 1;
 
@@ -29,29 +62,130 @@ __END__
 
 =head1 NAME
 
-Tree::Simple::View - A class for viewing Tree::Simple hierarchies in various formats
+Tree::Simple::View - A set of classes for viewing Tree::Simple hierarchies in various output formats
 
 =head1 SYNOPSIS
 
-  use Tree::Simple::View;
-  # the default uses Tree::Simple::View::HTML 
+  # create a custom Tree View class
+  package MyCustomTreeView;
   
-  use Tree::Simple::View qw(DHTML);
-  # now uses the Tree::Simple::View::DHTML class
+  use strict;
+  use warnings; 
+  
+  # inherit from this class
+  our @ISA = qw(Tree::Simple::View);
+  
+  # define (at a minimum) these methods
+  sub expandPathSimple { ... }
+  sub expandPathComplex { ... }
+  
+  sub expandAllSimple { ... }
+  sub expandAllComplex { ... }    
+  
+  1;
 
 =head1 DESCRIPTION
 
-This serves as a proxy front end to the Tree::Simple::View::* classes. For now all that are included are; Tree::Simple::View::HTML and Tree::Simple::View::DHTML. Eventually I will be adding more Tree::Simple::View::* classes for it to proxy, see the L<TO DO> section for more information.
+This serves as an abstract base class to the Tree::Simple::View::* classes. There are two implementing classes included here; Tree::Simple::View::HTML and Tree::Simple::View::DHTML. Other Tree::Simple::View::* classes are also being planned, see the L<TO DO> section for more information.
 
-This is the first release of this set of modules, and therefore it is not totally "complete". That is not to say it isn't usable. It is based on some older tree formatting code I had lying around but had never properly modularized. However, I will be using these modules in a production system in the upcoming months, so you can expect many updates which should provide increases in both performance and reliability.
+This is still an early release of this set of modules, and therefore it is not totally "complete". That is not to say it isn't usable. It is based on some older tree formatting code I had lying around but had never properly modularized. However, I will be using these modules in a production system in the upcoming months, so you can expect many updates which should provide increases in both performance and reliability. My recommendation is not to use this in your production systems as yet, however, if you are interested in this module and would eventually like to use it, please email me and I will do my best to help out.
 
 =head1 METHODS
 
 =over 4
 
-=item B<new ($tree, %config)>
+=item B<new ($tree, %configuration)>
 
-Depending upon the value given in the C<use> statement, this will return an instance of Tree::Simple::View::* class. It is just a proxy to the C<Tree::Simple::View::*::new> methods.
+Accepts a C<$tree> argument of a Tree::Simple object (or one derived from Tree::Simple), if C<$tree> is not a Tree::Simple object, and exception is thrown. This C<$tree> object does not need to be a ROOT, you can start at any level of the tree you desire. The options in the C<%config> argument are determined by the implementing subclass, and you should refer to that documentation for details.
+
+=item B<getTree>
+
+A basic accessor to reach the underlying tree object. 
+
+=item B<getConfig>
+
+A basic accessor to reach the underlying configuration hash. 
+
+=item B<expandPath (@path)>
+
+This method will return a string which will represent your tree expanded along the given C<@path>. This is best shown visually. Given this tree:
+
+  Tree-Simple-View
+      lib
+          Tree
+              Simple
+                  View.pm
+                  View
+                      HTML.pm
+                      DHTML.pm
+      Makefile.PL
+      MANIFEST
+      README 
+      Changes
+      t
+          10_Tree_Simple_View_test.t
+          20_Tree_Simple_View_HTML_test.t
+          30_Tree_Simple_View_DHTML_test.t
+          
+And given this path:
+
+  Tree-Simple-View, lib, Tree, Simple
+
+Your display would like something like this:
+
+  Tree-Simple-View
+      lib
+          Tree
+              Simple
+                  View.pm
+                  View
+      Makefile.PL
+      MANIFEST
+      README 
+      Changes
+      t
+
+As you can see, the given path has been expanded, but no other sub-trees are shown. The details of this are subject to the implementating subclass, and their documentation should be consulted.
+
+It should be noted that this method actually calls either the C<expandPathSimple> or C<expandPathComplex> method depending upon the C<%config> argument in the constructor. 
+
+=item B<expandPathSimple ($tree, @path)>
+
+Within this base package, this is an abstract method, it will throw an exception if called.
+
+If no C<%config> argument is given in the constructor, then this method is called by C<expandPath>. This method is optimized since it does not need to process any configuration, but just as the name implies, it's output is simple.
+
+This method can also be used for another purpose, which is to bypass a previously specified configuration and use the base "simple" configuration instead.
+
+=item B<expandPathComplex ($tree, $config, @path)>
+
+Within this base package, this is an abstract method, it will throw an exception if called.
+
+If a C<%config> argument is given in the constructor, then this method is called by C<expandPath>. This method has been optimized to be used with configurations, and will actually custom compile code (using C<eval>) to speed up the generation of the output.
+
+This method can also be used for another purpose, which is to bypass a previously specified configuration and use the configuration specified (as a HASH reference) in the C<$config> parameter.
+
+=item B<expandAll>
+
+This method will return a string of HTML which will represent your tree completely expanded. The details of this are subject to the implementating subclass, and their documentation should be consulted.
+
+It should be noted that this method actually calls either the C<expandAllSimple> or C<expandAllComplex> method depending upon the C<%config> argument in the constructor.   
+
+=item B<expandAllSimple>
+
+Within this base package, this is an abstract method, it will throw an exception if called.
+
+If no C<%config> argument is given in the constructor, then this method is called by C<expandAll>. This method too is optimized since it does not need to process any configuration.
+
+This method as well can also be used to bypass a previously specified configuration and use the base "simple" configuration instead.
+
+=item B<expandAllComplex ($config)>
+
+Within this base package, this is an abstract method, it will throw an exception if called.
+
+If a C<%config> argument is given in the constructor, then this method is called by C<expandAll>. This method too has been optimized to be used with configurations, and will also custom compile code (using C<eval>) to speed up the generation of the output.
+
+Just as with C<expandPathComplex>, this method can be to bypass a previously specified configuration and use the configuration specified (as a HASH reference) in the C<$config> parameter.
 
 =back
 
@@ -65,11 +199,11 @@ To view a demo of the Tree::Simple::View::DHTML functionality, look in the C<exa
 
 =item B<More Tests>
 
-We could use some more tests, to help increase the coverage (which is only at 70.9% right now). Normally I would not release a module with coverage this low, but I need to get back to working on a project for a client (for which this module was created). But because I will be using this module in this project, I know I will be able to improve the test suite as I go.
+I have written several new tests for this release, and coverage is now at 91.2%, mostly it is the branch coverage that is poor. But even that is somewhat misleading since there is some code contained in dynamically generated strings whose coverage is never (and I don't think can ever) be tested. Eventually, I will be adding more tests to exercise these subroutines as well as fill in all the missing branch coverage.
 
 =item B<Adding new Tree::Simple::View::* classes>
 
-I have an Tree::Simple::View::ASCII class in the works, which will output Trees in plain text, and optionally support ANSI colors for terminal output.
+I have an Tree::Simple::View::ASCII class in the works, which will output Trees in plain text, and optionally support ANSI colors for terminal output. (NOTE: This may end up being just a thin wrapper around Data::TreeDumper's output, see L<SEE ALSO> section below).
 
 I am considering a Tree::Simple::View::PS or Tree::Simple::View::PDF class which could output either Postscript or PDF trees. 
 
@@ -90,18 +224,29 @@ I use B<Devel::Cover> to test the code coverage of my tests, below is the B<Deve
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
  File                                 stmt branch   cond    sub    pod   time  total
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- /Tree/Simple/View.pm                100.0   66.7    n/a  100.0  100.0    0.4   93.9
- /Tree/Simple/View/Base.pm            71.4   62.5   33.3   50.0  100.0   24.7   64.5
- /Tree/Simple/View/DHTML.pm           60.5   25.0    0.0   78.9  100.0    9.1   56.4
- /Tree/Simple/View/HTML.pm            71.3   41.7   20.0   85.0  100.0   11.0   63.7
- t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a    4.2  100.0
- t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   19.7  100.0
- t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   30.9  100.0
+ /Tree/Simple/View.pm                100.0  100.0   77.8  100.0  100.0    2.6   97.1
+ /Tree/Simple/View/DHTML.pm           96.7   46.4  100.0  100.0  100.0    8.4   89.4
+ /Tree/Simple/View/HTML.pm            91.6   45.0   60.0  100.0  100.0    9.1   80.8
+ t/10_Tree_Simple_View_test.t        100.0    n/a    n/a  100.0    n/a   24.0  100.0
+ t/20_Tree_Simple_View_HTML_test.t   100.0    n/a    n/a  100.0    n/a   40.4  100.0
+ t/30_Tree_Simple_View_DHTML_test.t  100.0    n/a    n/a  100.0    n/a   15.6  100.0
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
- Total                                77.3   40.5   20.0   82.9  100.0  100.0   70.9
+ Total                                97.0   51.3   73.3  100.0  100.0  100.0   91.2
  ---------------------------------- ------ ------ ------ ------ ------ ------ ------
 
+NOTE: There are a few dynamically compiled subroutines which are created from evaled strings. The coverage of these subroutines is not test (and I am not sure it can be), so the numbers here are somewhat misleading. Extensively testing this code however is on the L<TO DO> list.
+
 =head1 SEE ALSO
+
+This is just an abstract base class, I suggest you read the documentation in the implementing subclasses:
+
+=over 4
+
+=item B<Tree::Simple::View::HTML>
+
+=item B<Tree::Simple::View::DHTML>
+
+=back
 
 There are a few modules out there that I have seen which do similar things to these modules. I have attempted to describe them here, but not being a user of these modules myself, I can not do them justice. If you think I have mis-represented or just under-represented these modules, please let me know. Also, if I have not included a module which should be here, let me know and I will add it.
 
@@ -121,7 +266,7 @@ This module is similar to the HTML::PopupTreeSelect, in that it is intended for 
 
 =item B<Data::TreeDumper>
 
-This module is an alternative to Data::Dumper for dumping out tree structures. As the author points out, the output of Data::Dumper when dealing with tree structures can be difficult to read at best. This module solves that problem by dumping a much more readable and understandable output for tree data-structres. There are a lot of options for output, including custom output filters, so it is concievable that you could produce similar output to this module's with Data::TreeDumper. However, the central goal of Data::TreeDumper is more for viewing of data structures by developers and not for UI output (which Tree::Simple::View is for). 
+This module is an alternative to Data::Dumper for dumping out various types of data structures. As the author points out, the output of Data::Dumper when dealing with tree structures can be difficult to read at best. This module solves that problem by dumping a much more readable and understandable output specialy for tree structres. Data::TreeDumper has many options for output, including custom filters, so it quite possible to produce similar output to these module's using Data::TreeDumper. I have actually been working with this modules author to ensure compatability between Data::TreeDumper and Tree::Simple, and we have been sharing code so that Data::TreeDumper's output can utilize some of Tree::Simple::View's capabilities. Ideally this will give Tree::Simple the ability to utilize the ASCII/ANSI output styles of Data::TreeDumper and Data::TreeDumper the ability to easily display output in HTML/DHTML.
 
 =back
 

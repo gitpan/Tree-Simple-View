@@ -4,11 +4,11 @@ package Tree::Simple::View::HTML;
 use strict;
 use warnings;
 
-use Tree::Simple::View::Base;
+use Tree::Simple::View;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-our @ISA = qw(Tree::Simple::View::Base);
+our @ISA = qw(Tree::Simple::View);
 
 use constant OPEN_TAG => 1;
 use constant CLOSE_TAG => 2;
@@ -280,7 +280,7 @@ This class outputs fairly vanilla HTML in its simpliest configuration, suitable 
 
 =item B<new ($tree, %configuration)>
 
-Accepts a C<$tree> argument of a Tree::Simple object (or one derived from Tree::Simple). This C<$tree> object does not need to be a ROOT, you can start at any level of the tree you desire. The options in the C<%config> argument are as follows:
+Accepts a C<$tree> argument of a Tree::Simple object (or one derived from Tree::Simple), if C<$tree> is not a Tree::Simple object, and exception is thrown. This C<$tree> object does not need to be a ROOT, you can start at any level of the tree you desire. The options in the C<%config> argument are as follows:
 
 =over 4
 
@@ -336,7 +336,6 @@ This method will return a string of HTML which will represent your tree expanded
               Simple
                   View.pm
                   View
-                      Base.pm
                       HTML.pm
                       DHTML.pm
       Makefile.PL

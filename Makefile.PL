@@ -4,6 +4,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Tree/Simple/View.pm', 
     PREREQ_PM    => {
         'Test::More'   => 0.47,
+        'Test::Exception' => 0.15,
         'Tree::Simple' => 1.05
     }
 );
