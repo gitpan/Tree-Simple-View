@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @ISA = qw(Tree::Simple::View);
 
@@ -147,6 +147,11 @@ sub _processListConfig {
 
     my $list_css = "";
     if (exists $config{list_css}) {
+        # make sure we have a proper ';' at the end
+        # of the CSS code here, it is needed by the
+        # DHTML subclass when we add the display property
+        # to it, no other element requires this so far,
+        # but if it did, this same idiom could be reused
         my $_list_css = $config{list_css};
         $_list_css .= ";" unless ($_list_css =~ /\;$/);        
         $list_css = " STYLE='${_list_css}'";
@@ -174,9 +179,7 @@ sub _processListItemConfig {
     
     my $list_item_css = "";
     if (exists $config{list_item_css}) {
-        my $_list_item_css = $config{list_item_css};
-        $_list_item_css .= ";" unless ($_list_item_css =~ /\;$/);
-        $list_item_css = " STYLE='${_list_item_css}'";
+        $list_item_css = " STYLE='" . $config{list_item_css} . "'";
     }
     elsif (exists $config{list_item_css_class}) {
         $list_item_css = " CLASS='" . $config{list_item_css_class} . "'";
@@ -185,9 +188,7 @@ sub _processListItemConfig {
 
     my $expanded_item_css = "";
     if (exists $config{expanded_item_css}) {
-        my $_expanded_item_css = $config{expanded_item_css};
-        $_expanded_item_css .= ";" unless ($_expanded_item_css =~ /\;$/);    
-        $expanded_item_css = " STYLE='${_expanded_item_css}'";
+        $expanded_item_css = " STYLE='" . $config{expanded_item_css} . "'";
     }
     elsif (exists $config{expanded_item_css_class}) {
         $expanded_item_css = " CLASS='" . $config{expanded_item_css_class} . "'";

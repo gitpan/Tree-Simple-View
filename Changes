@@ -1,5 +1,14 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.05 Fri Jun 25 2004
+    - changes the HREF part of the DHTML links to be
+      javascript:void(0) rather than just #, it stops
+      a problem in some browsers where clicking a link
+      would scroll you to the top of the page.
+      - updated tests to reflect this change
+    - removed some code which was not nessecary from the
+      Tree::Simple::View::HTML class. 
+
 0.04 Fri Jun 25 2004
     !*!*!*! MAJOR UPDATE !*!*!*!
     - My orginal vision for Tree::Simple::View was that of

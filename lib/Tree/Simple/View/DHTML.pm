@@ -6,7 +6,7 @@ use warnings;
 
 use Tree::Simple::View::HTML;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our @ISA = qw(Tree::Simple::View::HTML);
 
@@ -39,7 +39,7 @@ sub expandPathSimple  {
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         unless ($t->isLeaf()) {
-            push @results => ("<LI><A HREF=# onClick='toggleList(\"${tree_id}_" . $self->{list_counter_id}. "\")'>" . 
+            push @results => ("<LI><A HREF='javascript:void(0);' onClick='toggleList(\"${tree_id}_" . $self->{list_counter_id}. "\")'>" . 
                                 $t->getNodeValue() . "</A></LI>");            
             push @results => "<UL ID='${tree_id}_" . $self->{list_counter_id} . "' STYLE='display: $display_style;'>"; 
             $self->{list_counter_id}++;       
@@ -99,7 +99,7 @@ sub expandAllSimple  {
         my $current_depth = $t->getDepth();
         push @results => ("</UL>" x ($last_depth - $current_depth)) if ($last_depth > $current_depth);
         unless ($t->isLeaf()) {
-            push @results => ("<LI><A HREF=# onClick='toggleList(\"${tree_id}_" . $self->{list_counter_id}. "\")'>" . 
+            push @results => ("<LI><A HREF='javascript:void(0);' onClick='toggleList(\"${tree_id}_" . $self->{list_counter_id}. "\")'>" . 
                                 $t->getNodeValue() . "</A></LI>");            
             push @results => "<UL ID='${tree_id}_" . $self->{list_counter_id} . "'>"; 
             $self->{list_counter_id}++;       
@@ -153,6 +153,9 @@ use constant LIST_FUNCTION_CODE_STRING => q|
         if ($tag_type == OPEN_TAG && $list_id && $display_style) {
             my $temp_list_css;
             if ($list_css && $list_css !~ /CLASS/) {
+                # in case someone has already set the list_css
+                # property, we need to add out display property
+                # to it, so we need to do a little text mangling
                 $temp_list_css = $list_css;
                 chop($temp_list_css);            
                 $temp_list_css .= " display: $display_style;'";
@@ -180,9 +183,7 @@ sub _buildListItemFunction {
     
     my $link_css = "";
     if (exists $config{link_css}) {
-        my $_link_css = $config{link_css};
-        $_link_css .= ";" unless ($_link_css =~ /\;$/);    
-        $link_css = " STYLE='${_link_css}'";    
+        $link_css = " STYLE='" . $config{link_css}. "'";    
     }
     elsif (exists $config{link_css_class}) {
         $link_css = " CLASS='" . $config{link_css_class} . "'";
@@ -203,7 +204,7 @@ use constant LIST_ITEM_FUNCTION_CODE_STRING  => q|;
             $item_css = $expanded_item_css if $expanded_item_css;
             return "<LI${item_css}>" . 
                         (($form_element_formatter) ? $form_element_formatter->($t) : "") . 
-                    "<A${link_css} HREF=# onClick='toggleList(\"${tree_id}\")'>" . 
+                    "<A${link_css} HREF='javascript:void(0);' onClick='toggleList(\"${tree_id}\")'>" . 
                             (($node_formatter) ? $node_formatter->($t) : $t->getNodeValue()) . 
                     "</A></LI>";            
         }

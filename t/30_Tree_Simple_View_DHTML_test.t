@@ -54,28 +54,28 @@ can_ok("Tree::Simple::View::DHTML", 'expandAll');
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
     my $expected = <<EXPECTED;
 <UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
 <UL ID='${view_id}_1'>
 <LI>1.1</LI>
-<LI><A HREF=# onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
 <UL ID='${view_id}_2'>
 <LI>1.2.1</LI>
 <LI>1.2.2</LI>
 </UL>
 <LI>1.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
 <UL ID='${view_id}_3'>
 <LI>2.1</LI>
 <LI>2.2</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
 <UL ID='${view_id}_4'>
 <LI>3.1</LI>
 <LI>3.2</LI>
 <LI>3.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
 <UL ID='${view_id}_5'>
 <LI>4.1</LI>
 </UL></UL>
@@ -96,28 +96,28 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
     my $expected = <<EXPECTED;
 <UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
 <UL ID='${view_id}_1' STYLE='display: block;'>
 <LI>1.1</LI>
-<LI><A HREF=# onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
 <UL ID='${view_id}_2' STYLE='display: block;'>
 <LI>1.2.1</LI>
 <LI>1.2.2</LI>
 </UL>
 <LI>1.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
 <UL ID='${view_id}_3' STYLE='display: none;'>
 <LI>2.1</LI>
 <LI>2.2</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
 <UL ID='${view_id}_4' STYLE='display: none;'>
 <LI>3.1</LI>
 <LI>3.2</LI>
 <LI>3.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
 <UL ID='${view_id}_5' STYLE='display: none;'>
 <LI>4.1</LI>
 </UL></UL>
@@ -138,28 +138,28 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
     my $expected = <<EXPECTED;
 <OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
 <OL ID='${view_id}_1'>
 <LI>1.1</LI>
-<LI><A HREF=# onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
 <OL ID='${view_id}_2'>
 <LI>1.2.1</LI>
 <LI>1.2.2</LI>
 </OL>
 <LI>1.3</LI>
 </OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
 <OL ID='${view_id}_3'>
 <LI>2.1</LI>
 <LI>2.2</LI>
 </OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
 <OL ID='${view_id}_4'>
 <LI>3.1</LI>
 <LI>3.2</LI>
 <LI>3.3</LI>
 </OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
 <OL ID='${view_id}_5'>
 <LI>4.1</LI>
 </OL></OL>
@@ -179,28 +179,28 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);
     my $expected = <<EXPECTED;
 <OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
 <OL STYLE='display: none;' ID='${view_id}_1'>
 <LI>1.1</LI>
-<LI><A HREF=# onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
 <OL STYLE='display: none;' ID='${view_id}_2'>
 <LI>1.2.1</LI>
 <LI>1.2.2</LI>
 </OL>
 <LI>1.3</LI>
 </OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
 <OL STYLE='display: block;' ID='${view_id}_3'>
 <LI>2.1</LI>
 <LI>2.2</LI>
 </OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
 <OL STYLE='display: none;' ID='${view_id}_4'>
 <LI>3.1</LI>
 <LI>3.2</LI>
 <LI>3.3</LI>
 </OL>
-<LI><A HREF=# onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
 <OL STYLE='display: none;' ID='${view_id}_5'>
 <LI>4.1</LI>
 </OL></OL>
@@ -223,28 +223,28 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
     my $expected = <<EXPECTED;
 <UL STYLE='list-style: circle;'>
-<LI><A HREF=# onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_1'>
 <LI>1.1</LI>
-<LI><A HREF=# onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_2'>
 <LI>1.2.1</LI>
 <LI>1.2.2</LI>
 </UL>
 <LI>1.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_3'>
 <LI>2.1</LI>
 <LI>2.2</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_4'>
 <LI>3.1</LI>
 <LI>3.2</LI>
 <LI>3.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
 <UL STYLE='list-style: circle;' ID='${view_id}_5'>
 <LI>4.1</LI>
 </UL></UL>
@@ -268,28 +268,28 @@ EXPECTED
     my ($view_id) = ($tree_view =~ /\((.*?)\)$/);    
     my $expected = <<EXPECTED;
 <UL STYLE='list-style: circle;'>
-<LI><A HREF=# onClick='toggleList("${view_id}_1")'>1</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_1")'>1</A></LI>
 <UL STYLE='list-style: circle; display: block;' ID='${view_id}_1'>
 <LI>1.1</LI>
-<LI><A HREF=# onClick='toggleList("${view_id}_2")'>1.2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_2")'>1.2</A></LI>
 <UL STYLE='list-style: circle; display: block;' ID='${view_id}_2'>
 <LI>1.2.1</LI>
 <LI>1.2.2</LI>
 </UL>
 <LI>1.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_3")'>2</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_3")'>2</A></LI>
 <UL STYLE='list-style: circle; display: none;' ID='${view_id}_3'>
 <LI>2.1</LI>
 <LI>2.2</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_4")'>3</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_4")'>3</A></LI>
 <UL STYLE='list-style: circle; display: none;' ID='${view_id}_4'>
 <LI>3.1</LI>
 <LI>3.2</LI>
 <LI>3.3</LI>
 </UL>
-<LI><A HREF=# onClick='toggleList("${view_id}_5")'>4</A></LI>
+<LI><A HREF='javascript:void(0);' onClick='toggleList("${view_id}_5")'>4</A></LI>
 <UL STYLE='list-style: circle; display: none;' ID='${view_id}_5'>
 <LI>4.1</LI>
 </UL></UL>
