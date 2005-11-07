@@ -4,7 +4,7 @@ package Tree::Simple::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Scalar::Util qw(blessed);
 
@@ -15,11 +15,12 @@ sub new {
     my $class = ref($_class) || $_class;
     ($class ne 'Tree::Simple::View')
         || throw Tree::Simple::View::AbstractClass "Tree::Simple::View is an abstract class, try Tree::Simple::View::HTML or Tree::Simple::View::DHTML instead"; 
-    my $tree_view = {
-        tree => undef,
-        config => {}
-        };
-    bless($tree_view, $class);
+    my $tree_view = bless{
+        tree                  => undef,
+        config                => {},
+        include_trunk         => undef,
+        ppath_comparison_func => undef
+    } => $class;
     $tree_view->_init($tree, %configuration);
     return $tree_view;
 }
@@ -28,21 +29,14 @@ sub _init {
     my ($self, $tree, %config) = @_;
     (blessed($tree) && $tree->isa("Tree::Simple"))
         || throw Tree::Simple::View::InsufficientArguments "tree argument must be a Tree::Simple object";
-    $self->{tree} = $tree;
-    $self->{config} = \%config if %config;
-    $self->{include_trunk} = 0; 
+    $self->{tree}                 = $tree;
+    $self->{config}               = \%config if %config;
+    $self->{include_trunk}        = 0; 
     $self->{path_comparison_func} = undef;
 }
 
-sub getTree {
-    my ($self) = @_;
-    return $self->{tree};
-}
-
-sub getConfig {
-    my ($self) = @_;
-    return $self->{config};
-}
+sub getTree   { (shift)->{tree}   }
+sub getConfig { (shift)->{config} }
 
 sub includeTrunk {
     my ($self, $boolean) = @_;

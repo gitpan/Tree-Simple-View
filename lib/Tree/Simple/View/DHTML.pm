@@ -4,7 +4,7 @@ package Tree::Simple::View::DHTML;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use base 'Tree::Simple::View::HTML';
 
@@ -259,7 +259,7 @@ use constant LIST_ITEM_FUNCTION_CODE_STRING  => q|;
 |;
 
 use constant javascript => q|
-<SCRIPT LANGAUGE="javascript">
+<SCRIPT LANGUAGE="javascript">
 function toggleList(tree_id) {
     var element = document.getElementById(tree_id);
     if (element) {

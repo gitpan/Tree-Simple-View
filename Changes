@@ -1,5 +1,9 @@
 Revision history for Perl extension Tree-Simple-View.
 
+0.13 Mon. November 7, 2005
+    - fixing typo on the generated HTML (rt.cpan.org Ticket #14963)
+    - cleaned up View.pm as little as well
+
 0.12 Mon Jan 31 2005
     - converted this to use Class::Throwable for exceptions
        - altered tests for this
