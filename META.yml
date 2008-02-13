@@ -1,6 +1,6 @@
 ---
 name: Tree-Simple-View
-version: 0.16
+version: 0.17
 author:
   - 'stevan little, E<lt>stevan@iinteractive.comE<gt>'
 abstract: A set of classes for viewing Tree::Simple hierarchies
@@ -18,10 +18,10 @@ build_requires:
 provides:
   Tree::Simple::View:
     file: lib/Tree/Simple/View.pm
-    version: 0.16
+    version: 0.17
   Tree::Simple::View::ASCII:
     file: lib/Tree/Simple/View/ASCII.pm
-    version: 0.01
+    version: 0.02
   Tree::Simple::View::DHTML:
     file: lib/Tree/Simple/View/DHTML.pm
     version: 0.13
@@ -31,7 +31,7 @@ provides:
   Tree::Simple::View::HTML:
     file: lib/Tree/Simple/View/HTML.pm
     version: 0.12
-generated_by: Module::Build version 0.2805
+generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

@@ -2,18 +2,18 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'PL_FILES' => {},
-          'INSTALLDIRS' => 'site',
           'NAME' => 'Tree::Simple::View',
-          'EXE_FILES' => [],
           'VERSION_FROM' => 'lib/Tree/Simple/View.pm',
           'PREREQ_PM' => {
-                           'Test::More' => '0.47',
-                           'Test::LongString' => 0,
-                           'Scalar::Util' => '1.18',
                            'Class::Throwable' => '0.1',
+                           'Scalar::Util' => '1.18',
                            'Test::Exception' => '0.15',
+                           'Test::LongString' => '0',
+                           'Test::More' => '0.47',
                            'Tree::Simple' => '1.07'
-                         }
+                         },
+          'INSTALLDIRS' => 'site',
+          'EXE_FILES' => [],
+          'PL_FILES' => {}
         )
 ;
